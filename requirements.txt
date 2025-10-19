@@ -1,0 +1,24 @@
+# PyTorch with CUDA 12.8 support for RTX 5070 Ti (Blackwell architecture)
+--extra-index-url https://download.pytorch.org/whl/nightly/cu128
+torch>=2.10.0.dev20251018+cu128
+torchvision>=0.25.0.dev20251018+cu128
+
+# Transformer models
+transformers==4.36.0
+sentencepiece==0.2.1
+protobuf==6.33.0
+accelerate==1.10.1
+safetensors
+
+# Protein sequence processing
+biopython==1.83
+fair-esm
+
+# ML & Data processing
+numpy==2.0.1
+pandas
+scikit-learn
+scipy
+
+# Utilities
+tqdm

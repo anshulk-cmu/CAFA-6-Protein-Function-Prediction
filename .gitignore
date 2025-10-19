@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.egg-info/
+*.so
+env/
+venv/
+cafa6/
+
+# Large data files - DO NOT COMMIT
+cafa6_project/data/*.fasta
+cafa6_project/data/*.zip
+cafa6_project/data/*.obo
+cafa6_project/data/train_*.tsv
+cafa6_project/data/testsuperset-taxon-list.tsv
+
+# Keep small files
+!cafa6_project/data/IA.tsv
+!cafa6_project/data/sample_submission.tsv
+
+# Embeddings - too large
+cafa6_project/embeddings/*.npy
+
+# Models
+cafa6_project/models/*.pt
+cafa6_project/models/*.pth
+cafa6_project/models/*.pkl
+
+# Outputs
+cafa6_project/outputs/*.tsv
+cafa6_project/outputs/*.csv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cache
+.cache/
+*.ipynb_checkpoints/
