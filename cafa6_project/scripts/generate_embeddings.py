@@ -49,11 +49,11 @@ class ProteinEmbedder:
         if platform.system() != 'Windows':
             try:
                 self.model = torch.compile(self.model, mode='reduce-overhead')
-                print("✓ Torch compile enabled")
+                print("Torch compile enabled")
             except:
-                print("⚠ Torch compile unavailable")
+                print("Torch compile unavailable")
         else:
-            print("⚠ Torch compile disabled (Windows)")
+            print("Torch compile disabled (Windows)")
     
     def read_fasta(self, fasta_path):
         sequences = []
@@ -81,7 +81,7 @@ class ProteinEmbedder:
         emb_file = f"{output_path}_embeddings.npy"
         id_file = f"{output_path}_ids.npy"
         if os.path.exists(emb_file) and os.path.exists(id_file):
-            print(f"✓ Found existing: {output_path}")
+            print(f"Found existing: {output_path}")
             return True
         return False
     
@@ -119,7 +119,7 @@ class ProteinEmbedder:
         np.save(f"{output_path}_embeddings.npy", reordered_embeddings)
         np.save(f"{output_path}_ids.npy", np.array(ids))
         
-        print(f"✓ Saved {reordered_embeddings.shape}")
+        print(f"Saved {reordered_embeddings.shape}")
         
         del all_embeddings, embeddings_array, reordered_embeddings
         torch.cuda.empty_cache()
@@ -141,10 +141,10 @@ def main():
     test_fasta = f"{data_dir}/testsuperset.fasta"
     
     configs = [
-        ('esm2_650m', 32),
-        ('esm2_3b', 8),
-        ('protbert', 24),
-        ('ankh', 24)
+        ('esm2_650m', 16),
+        ('esm2_3b', 4),
+        ('protbert', 12),
+        ('ankh', 12)
     ]
     
     for model_name, batch_size in configs:
@@ -162,7 +162,7 @@ def main():
         gc.collect()
     
     print("\n" + "="*60)
-    print("✓ ALL EMBEDDINGS COMPLETE")
+    print("ALL EMBEDDINGS COMPLETE")
     print("="*60)
 
 if __name__ == "__main__":
