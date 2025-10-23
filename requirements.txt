@@ -22,3 +22,6 @@ scipy
 
 # Utilities
 tqdm
+pyyaml
+matplotlib
+psutil  # For GPU monitoring

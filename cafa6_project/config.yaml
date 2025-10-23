@@ -1,0 +1,75 @@
+# CAFA-6 Protein Function Prediction Configuration
+# Phase 1: Embedding Generation Settings
+
+models:
+  esm2_650m:
+    hf_name: "facebook/esm2_t33_650M_UR50D"
+    batch_size: 16
+    dimensions: 1280
+    description: "ESM-2 650M - Efficient protein language model"
+
+  esm2_3b:
+    hf_name: "facebook/esm2_t36_3B_UR50D"
+    batch_size: 4
+    dimensions: 1280
+    description: "ESM-2 3B - Large protein language model"
+
+  protbert:
+    hf_name: "Rostlab/prot_bert_bfd"
+    batch_size: 12
+    dimensions: 1024
+    description: "ProtBERT-BFD - Domain-specific BERT"
+
+  ankh:
+    hf_name: "ElnaggarLab/ankh-large"
+    batch_size: 12
+    dimensions: 1536
+    description: "Ankh Large - Specialized protein model"
+
+paths:
+  data_dir: "../data"
+  embeddings_dir: "../embeddings"
+  outputs_dir: "../outputs"
+  logs_dir: "../outputs/logs"
+
+datasets:
+  train:
+    filename: "train_sequences.fasta"
+    description: "Training sequences (82,404 proteins)"
+
+  test:
+    filename: "testsuperset.fasta"
+    description: "Test sequences (224,309 proteins)"
+
+optimization:
+  use_compile: true              # torch.compile() for kernel fusion
+  use_amp: true                  # Automatic mixed precision (fp16)
+  use_half: true                 # Load models in half precision
+  cudnn_benchmark: true          # Auto-tune cuDNN kernels
+  tf32_matmul: true              # TensorFloat32 for faster matmul
+  pin_memory: true               # Faster CPU->GPU transfers
+  num_workers: 0                 # DataLoader workers (0=main thread)
+  cache_clear_interval: 50       # Clear CUDA cache every N batches
+  warmup_batches: 3              # Warmup iterations (excluded from timing)
+
+tokenizer:
+  max_length: 1024               # Max sequence length (tokens)
+  truncation: true               # Truncate long sequences
+  padding: true                  # Pad to batch max length
+
+logging:
+  level: "INFO"                  # DEBUG, INFO, WARNING, ERROR
+  save_to_file: true             # Save logs to disk
+  console_output: true           # Print to console
+  json_report: true              # Generate JSON performance report
+
+profiling:
+  enabled: false                 # Enable torch.profiler (slow, for debugging)
+  wait_steps: 2                  # Profiler warmup
+  warmup_steps: 2                # Profiler warmup
+  active_steps: 4                # Profiler active recording
+  repeat: 1                      # Repeat cycle
+
+benchmark:
+  subset_size: 1000              # Number of proteins for CPU/GPU comparison
+  seed: 42                       # Random seed for reproducibility
