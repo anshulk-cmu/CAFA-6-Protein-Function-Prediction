@@ -1,57 +1,27 @@
-# CAFA 6 Protein Function Prediction - Dependencies
-# Phase 1: GPU-Optimized Embedding Generation Pipeline
-
-# ============================================================================
-# PyTorch with CUDA Support
-# ============================================================================
-# For RTX 5070 Ti / 50-series (Blackwell) GPUs: CUDA 12.8 required
-# For RTX 30/40-series: Use stable PyTorch with CUDA 11.8
+# PyTorch with CUDA 12.8 (RTX 5070 Ti / 50-series)
 --extra-index-url https://download.pytorch.org/whl/nightly/cu128
 torch>=2.10.0.dev20251018+cu128
 torchvision>=0.25.0.dev20251018+cu128
 
-# ============================================================================
-# Transformer Models & NLP
-# ============================================================================
-transformers==4.36.0        # Hugging Face transformers (ESM-2, ProtBERT, Ankh)
-sentencepiece==0.2.1        # Tokenization for ProtBERT
-protobuf==6.33.0            # Protocol buffers for model serialization
-accelerate==1.10.1          # Distributed training & optimization
-safetensors                 # Fast & safe tensor serialization
+# Transformer models
+transformers==4.36.0
+sentencepiece==0.2.1
+protobuf==6.33.0
+accelerate==1.10.1
+safetensors
 
-# ============================================================================
-# Protein Sequence Processing
-# ============================================================================
-biopython==1.83             # FASTA parsing, sequence manipulation
-fair-esm                    # Facebook AI ESM-2 models (3B & 650M)
+# Protein processing
+biopython==1.83
+fair-esm
 
-# ============================================================================
-# Machine Learning & Data Processing
-# ============================================================================
-numpy==2.0.1                # Numerical computing
-pandas                      # Data manipulation & analysis
-scikit-learn                # ML utilities, metrics
-scipy                       # Scientific computing
+# ML & data
+numpy==2.0.1
+pandas
+scikit-learn
+scipy
 
-# ============================================================================
-# Utilities & Monitoring
-# ============================================================================
-tqdm                        # Progress bars for long-running operations
-pyyaml                      # YAML configuration file parsing (config.yaml)
-matplotlib                  # Visualization (benchmark plots, GPU analysis)
-psutil                      # System & GPU monitoring (gpu_monitor.py)
-
-# ============================================================================
-# Installation Instructions
-# ============================================================================
-# RTX 5070 Ti / 50-series (Blackwell):
-#   pip install -r requirements.txt
-#
-# RTX 30/40-series:
-#   1. Remove --extra-index-url line and torch/torchvision versions above
-#   2. Install PyTorch: conda install pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia
-#   3. Install remaining: pip install -r requirements.txt
-#
-# Verify installation:
-#   cd cafa6_project/scripts
-#   python test_setup.py
+# Utilities
+tqdm
+pyyaml
+matplotlib
+psutil
