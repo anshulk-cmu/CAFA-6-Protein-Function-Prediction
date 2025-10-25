@@ -57,6 +57,7 @@ def collate_fn(batch):
 class ProteinEmbedder:
     def __init__(self, model_name, device='cuda', batch_size=8, config=None, logger=None):
         self.device = device
+        self.base_batch_size = batch_size  # Store original batch size
         self.batch_size = batch_size
         self.model_name = model_name
         self.config = config or {}
@@ -72,6 +73,15 @@ class ProteinEmbedder:
             'warmup_batches': 0,
             'peak_memory_gb': 0,
             'avg_memory_gb': 0
+        }
+
+        # Dynamic batching settings
+        self.use_dynamic_batching = config.get('optimization', {}).get('dynamic_batching', True)
+        self.length_thresholds = {
+            256: 1.0,   # 100% of batch_size for sequences < 256
+            512: 0.5,   # 50% of batch_size for sequences < 512
+            768: 0.33,  # 33% of batch_size for sequences < 768
+            1024: 0.25  # 25% of batch_size for sequences < 1024
         }
 
         self.logger.info(f"Loading {model_name}...")
@@ -156,6 +166,54 @@ class ProteinEmbedder:
 
         return embeddings.cpu().float().numpy()
 
+    def get_dynamic_batch_size(self, max_seq_length):
+        """
+        Calculate optimal batch size based on maximum sequence length in batch.
+
+        Memory usage for transformers scales as O(n²) due to self-attention.
+        Longer sequences require exponentially more memory.
+        """
+        if not self.use_dynamic_batching:
+            return self.base_batch_size
+
+        # Find appropriate multiplier based on sequence length
+        multiplier = 0.25  # Default for very long sequences (>1024)
+        for threshold, mult in sorted(self.length_thresholds.items()):
+            if max_seq_length < threshold:
+                multiplier = mult
+                break
+
+        dynamic_size = max(1, int(self.base_batch_size * multiplier))
+        return dynamic_size
+
+    def save_checkpoint(self, checkpoint_path, batch_idx, processed_embeddings, processed_ids):
+        """Save checkpoint for crash recovery"""
+        checkpoint = {
+            'batch_idx': batch_idx,
+            'processed_count': len(processed_ids),
+            'embeddings': processed_embeddings,
+            'ids': processed_ids,
+            'model_name': self.model_name,
+            'timestamp': time.time()
+        }
+
+        temp_path = f"{checkpoint_path}.tmp"
+        np.save(temp_path, checkpoint, allow_pickle=True)
+        os.rename(temp_path, checkpoint_path)  # Atomic operation
+
+    def load_checkpoint(self, checkpoint_path):
+        """Load checkpoint if exists"""
+        if os.path.exists(checkpoint_path):
+            try:
+                checkpoint = np.load(checkpoint_path, allow_pickle=True).item()
+                self.logger.info(f"Loaded checkpoint: batch {checkpoint['batch_idx']}, "
+                               f"{checkpoint['processed_count']} proteins processed")
+                return checkpoint
+            except Exception as e:
+                self.logger.warning(f"Failed to load checkpoint: {e}")
+                return None
+        return None
+
     def check_existing(self, output_path):
         """Check if embeddings already exist"""
         emb_file = f"{output_path}_embeddings.npy"
@@ -166,7 +224,13 @@ class ProteinEmbedder:
         return False
 
     def generate_embeddings(self, fasta_path, output_path):
-        """Generate embeddings for all sequences in FASTA file"""
+        """
+        Generate embeddings for all sequences in FASTA file with optimizations:
+        - Dynamic batch sizing based on sequence length
+        - Checkpoint/resume support for crash recovery
+        - Streaming embeddings to disk (memory efficient)
+        - Aggressive memory management for long sequences
+        """
         if self.check_existing(output_path):
             return self.stats
 
@@ -176,35 +240,66 @@ class ProteinEmbedder:
         ids, sequences = self.read_fasta(fasta_path)
         self.stats['total_proteins'] = len(sequences)
 
-        # Create dataset and dataloader
+        # Setup checkpoint
+        checkpoint_path = f"{output_path}_checkpoint.npy"
+        checkpoint = self.load_checkpoint(checkpoint_path)
+
+        # Resume from checkpoint if exists
+        if checkpoint:
+            all_embeddings = checkpoint['embeddings']
+            all_ids = checkpoint['ids']
+            start_batch_idx = checkpoint['batch_idx'] + 1
+            self.logger.info(f"Resuming from batch {start_batch_idx}")
+        else:
+            all_embeddings = []
+            all_ids = []
+            start_batch_idx = 0
+
+        # Create sorted dataset (by length for efficient batching)
         dataset = ProteinDataset(sequences, ids)
-        pin_memory = self.config.get('optimization', {}).get('pin_memory', True)
-        num_workers = self.config.get('optimization', {}).get('num_workers', 0)
-
-        dataloader = DataLoader(
-            dataset,
-            batch_size=self.batch_size,
-            shuffle=False,
-            collate_fn=collate_fn,
-            pin_memory=pin_memory and self.device == 'cuda',
-            num_workers=num_workers
-        )
-
-        all_embeddings = []
-        all_ids = []
         warmup_batches = self.config.get('optimization', {}).get('warmup_batches', 3)
-        cache_clear_interval = self.config.get('optimization', {}).get('cache_clear_interval', 50)
+        checkpoint_interval = self.config.get('optimization', {}).get('checkpoint_interval', 500)
+
+        # Manual batching with dynamic sizing
+        data_list = list(dataset)
+        total_samples = len(data_list)
+
+        # Calculate total batches (approximate)
+        approx_batches = (total_samples + self.base_batch_size - 1) // self.base_batch_size
 
         # Progress bar
-        pbar = tqdm(dataloader, desc=f"{self.model_name}")
+        pbar = tqdm(total=total_samples, desc=f"{self.model_name}")
         start_time = time.time()
 
         memory_samples = []
+        batch_idx = 0
+        current_idx = 0
 
-        for batch_idx, (batch_seqs, batch_ids, batch_lens) in enumerate(pbar):
+        # Skip to checkpoint position if resuming
+        if start_batch_idx > 0:
+            # Estimate how many samples to skip
+            samples_processed = len(all_ids)
+            current_idx = samples_processed
+            pbar.update(samples_processed)
+
+        while current_idx < total_samples:
             batch_start = time.time()
 
             try:
+                # Get next batch with dynamic sizing
+                # Peek at sequence lengths to determine batch size
+                peek_end = min(current_idx + self.base_batch_size, total_samples)
+                peek_batch = data_list[current_idx:peek_end]
+                max_len = max(len(seq) for seq, _, _ in peek_batch)
+
+                # Calculate dynamic batch size
+                dynamic_batch_size = self.get_dynamic_batch_size(max_len)
+
+                # Get actual batch
+                batch_end = min(current_idx + dynamic_batch_size, total_samples)
+                batch_data = data_list[current_idx:batch_end]
+                batch_seqs, batch_ids, batch_lens = zip(*batch_data)
+
                 # Generate embeddings
                 embs = self.embed_batch(batch_seqs)
                 all_embeddings.append(embs)
@@ -223,30 +318,44 @@ class ProteinEmbedder:
                     self.stats['warmup_batches'] += 1
 
                 # Update progress bar with stats
-                if batch_idx >= warmup_batches and len(self.stats['batch_times']) > 0:
-                    avg_batch_time = np.mean(self.stats['batch_times'])
-                    proteins_processed = sum([emb.shape[0] for emb in all_embeddings])
-                    elapsed_time = time.time() - start_time
-                    proteins_per_sec = proteins_processed / elapsed_time if elapsed_time > 0 else 0
-                    
-                    pbar.set_postfix({
-                        'batch_time': f'{batch_time:.2f}s',
-                        'avg_time': f'{avg_batch_time:.2f}s',
-                        'prot/s': f'{proteins_per_sec:.1f}',
-                        'mem': f'{mem_gb:.1f}GB' if self.device == 'cuda' else 'N/A'
-                    })
+                proteins_processed = len(all_ids)
+                elapsed_time = time.time() - start_time
+                proteins_per_sec = proteins_processed / elapsed_time if elapsed_time > 0 else 0
 
-                # Clear cache periodically
-                if self.device == 'cuda' and (batch_idx + 1) % cache_clear_interval == 0:
-                    torch.cuda.empty_cache()
+                pbar.update(len(batch_seqs))
+                pbar.set_postfix({
+                    'batch': f'{batch_idx}/{approx_batches}',
+                    'bs': dynamic_batch_size,
+                    'max_len': max_len,
+                    'prot/s': f'{proteins_per_sec:.1f}',
+                    'mem': f'{mem_gb:.1f}GB' if self.device == 'cuda' else 'N/A'
+                })
+
+                # Aggressive memory management for long sequences
+                if max_len > 512 or batch_idx % 100 == 0:
+                    if self.device == 'cuda':
+                        torch.cuda.empty_cache()
+
+                # Save checkpoint periodically
+                if (batch_idx > 0 and batch_idx % checkpoint_interval == 0):
+                    self.save_checkpoint(checkpoint_path, batch_idx, all_embeddings, all_ids)
+                    self.logger.info(f"Checkpoint saved at batch {batch_idx}")
+
+                # Update counters
+                current_idx = batch_end
+                batch_idx += 1
 
             except Exception as e:
                 self.logger.error(f"Failed to process batch {batch_idx}: {e}")
+                # Save emergency checkpoint
+                self.save_checkpoint(checkpoint_path, batch_idx, all_embeddings, all_ids)
                 raise
+
+        pbar.close()
 
         # Calculate final statistics
         self.stats['total_time'] = time.time() - start_time
-        self.stats['total_batches'] = len(dataloader)
+        self.stats['total_batches'] = batch_idx
         
         if len(self.stats['batch_times']) > 0:
             self.stats['avg_batch_time'] = float(np.mean(self.stats['batch_times']))
@@ -293,6 +402,11 @@ class ProteinEmbedder:
         if self.device == 'cuda':
             torch.cuda.empty_cache()
         gc.collect()
+
+        # Remove checkpoint file after successful completion
+        if os.path.exists(checkpoint_path):
+            os.remove(checkpoint_path)
+            self.logger.info("Checkpoint file removed after successful completion")
 
         return self.stats
 

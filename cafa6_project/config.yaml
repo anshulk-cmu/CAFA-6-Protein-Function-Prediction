@@ -48,8 +48,12 @@ optimization:
   tf32_matmul: true              # TensorFloat32 for faster matmul
   pin_memory: true               # Faster CPU->GPU transfers
   num_workers: 0                 # DataLoader workers (0=main thread)
-  cache_clear_interval: 50       # Clear CUDA cache every N batches
+  cache_clear_interval: 50       # Clear CUDA cache every N batches (deprecated by dynamic batching)
   warmup_batches: 3              # Warmup iterations (excluded from timing)
+
+  # Advanced memory management (for OOM prevention)
+  dynamic_batching: true         # Adjust batch size based on sequence length
+  checkpoint_interval: 500       # Save checkpoint every N batches (for crash recovery)
 
 tokenizer:
   max_length: 1024               # Max sequence length (tokens)

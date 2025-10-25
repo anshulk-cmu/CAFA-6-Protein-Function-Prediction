@@ -160,7 +160,19 @@ All project settings are centralized in `config.yaml`:
 - `use_amp`: Automatic mixed precision (fp16)
 - `use_half`: Load models in half precision
 - `tf32_matmul`: TensorFloat32 for faster matrix operations
-- `cache_clear_interval`: Memory management
+
+### Advanced Memory Management (OOM Prevention)
+- **Dynamic Batching**: Automatically adjusts batch size based on sequence length
+  - Short sequences (<256 AA): Full batch size (e.g., 24)
+  - Medium sequences (256-512 AA): 50% batch size (e.g., 12)
+  - Long sequences (512-768 AA): 33% batch size (e.g., 8)
+  - Very long sequences (>768 AA): 25% batch size (e.g., 6)
+  - Prevents OOM errors from processing long proteins
+
+- **Checkpoint/Resume System**: Saves progress every 500 batches
+  - Automatic crash recovery - resume from last checkpoint
+  - Checkpoint files: `{output_path}_checkpoint.npy`
+  - Auto-deleted after successful completion
 
 ### Reproducibility Settings
 All scripts now include comprehensive seed initialization for full reproducibility:
@@ -237,7 +249,13 @@ pip install --pre torch torchvision --index-url https://download.pytorch.org/whl
 ```
 
 ### Out of Memory (OOM) Errors
-Reduce batch sizes in `config.yaml`:
+
+**Automatic Protection (Built-in):**
+The pipeline now includes dynamic batching that automatically reduces batch size for long sequences, preventing most OOM errors. No manual intervention needed!
+
+**If OOM still occurs:**
+1. Enable aggressive cache clearing (already optimized for long sequences)
+2. Reduce base batch sizes in `config.yaml`:
 ```yaml
 models:
   esm2_650m:
@@ -249,6 +267,9 @@ models:
   esm2_150m:
     batch_size: 12  # Reduce from 24
 ```
+
+**Resume from Crash:**
+If embedding generation crashes, simply re-run the same command. It will automatically resume from the last checkpoint (saves every 500 batches).
 
 ### CUDA Not Available
 Check NVIDIA drivers:
