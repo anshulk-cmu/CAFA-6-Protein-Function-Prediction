@@ -15,6 +15,18 @@ import argparse
 import random
 from pathlib import Path
 
+def set_seed(seed):
+    """
+    Set random seeds for reproducibility across all libraries.
+
+    Args:
+        seed: Random seed value
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
 class ProteinDataset(Dataset):
     def __init__(self, sequences, ids):
         self.data = list(zip(sequences, ids))
@@ -228,7 +240,7 @@ def profile_model(model_name, sequences, ids, batch_size, num_batches, output_pa
         torch.cuda.empty_cache()
 
 def create_subset(fasta_path, subset_size, seed=42):
-    """Create a random subset of sequences"""
+    """Create a random subset of sequences (seed already set globally)"""
     print(f"Reading sequences from {fasta_path}...")
     sequences = []
     ids = []
@@ -239,8 +251,7 @@ def create_subset(fasta_path, subset_size, seed=42):
 
     print(f"Total sequences: {len(sequences):,}")
 
-    # Random subset
-    random.seed(seed)
+    # Random subset (uses global seed)
     indices = random.sample(range(len(sequences)), min(subset_size, len(sequences)))
     subset_sequences = [sequences[i] for i in indices]
     subset_ids = [ids[i] for i in indices]
@@ -270,6 +281,10 @@ def main():
     print("="*60)
     print("TORCH PROFILER FOR PROTEIN EMBEDDINGS")
     print("="*60)
+
+    # Set random seed for reproducibility
+    set_seed(args.seed)
+    print(f"Random seed: {args.seed}")
 
     if torch.cuda.is_available():
         print(f"GPU: {torch.cuda.get_device_name(0)}")

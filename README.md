@@ -159,9 +159,34 @@ All project settings are centralized in `config.yaml`:
 - `use_compile`: torch.compile() for kernel fusion (Linux/Mac only)
 - `use_amp`: Automatic mixed precision (fp16)
 - `use_half`: Load models in half precision
-- `cudnn_benchmark`: Auto-tune cuDNN kernels
 - `tf32_matmul`: TensorFloat32 for faster matrix operations
 - `cache_clear_interval`: Memory management
+
+### Reproducibility Settings
+All scripts now include comprehensive seed initialization for full reproducibility:
+
+**Seeds are set for:**
+- Python's `random` module
+- NumPy's random number generator
+- PyTorch CPU operations (`torch.manual_seed`)
+- PyTorch CUDA operations (`torch.cuda.manual_seed_all`)
+
+**Configuration in `config.yaml`:**
+```yaml
+reproducibility:
+  seed: 42                       # Global random seed
+  cudnn_deterministic: false     # Set true for full determinism (slower)
+  cudnn_benchmark: true          # Set false for full determinism (slower)
+```
+
+**Trade-offs:**
+- **Default mode** (`cudnn_benchmark=true`): Reproducible embeddings with optimal performance
+- **Deterministic mode** (`cudnn_deterministic=true`): 100% bit-exact reproducibility but ~10-20% slower
+
+**Why this matters for competitions:**
+- Ensures identical embeddings across multiple runs
+- Critical for scientific reproducibility and ablation studies
+- Enables consistent evaluation and comparison of models
 
 ### Selective Model Execution
 Run specific models instead of all four:

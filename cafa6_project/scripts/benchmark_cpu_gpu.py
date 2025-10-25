@@ -18,6 +18,18 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import random
 
+def set_seed(seed):
+    """
+    Set random seeds for reproducibility across all libraries.
+
+    Args:
+        seed: Random seed value
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
 class ProteinDataset(Dataset):
     def __init__(self, sequences, ids):
         self.data = list(zip(sequences, ids))
@@ -168,7 +180,7 @@ def benchmark_model(model_name, sequences, ids, device, batch_size):
     return stats
 
 def create_subset(fasta_path, subset_size, seed=42):
-    """Create a random subset of sequences from FASTA file"""
+    """Create a random subset of sequences from FASTA file (seed already set globally)"""
     print(f"Reading sequences from {fasta_path}...")
     sequences = []
     ids = []
@@ -179,8 +191,7 @@ def create_subset(fasta_path, subset_size, seed=42):
 
     print(f"Total sequences: {len(sequences):,}")
 
-    # Random subset
-    random.seed(seed)
+    # Random subset (uses global seed)
     indices = random.sample(range(len(sequences)), min(subset_size, len(sequences)))
     subset_sequences = [sequences[i] for i in indices]
     subset_ids = [ids[i] for i in indices]
@@ -266,6 +277,11 @@ def main():
     print("="*60)
     print("CPU vs GPU BENCHMARK")
     print("="*60)
+
+    # Set random seed for reproducibility
+    set_seed(args.seed)
+    print(f"Random seed: {args.seed}")
+
     print(f"GPU: {torch.cuda.get_device_name(0)}")
     print(f"Models: {', '.join(args.models)}")
     print(f"Subset size: {args.subset:,} sequences")
