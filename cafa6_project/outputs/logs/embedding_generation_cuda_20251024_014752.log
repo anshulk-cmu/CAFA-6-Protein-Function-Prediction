@@ -1,0 +1,225 @@
+2025-10-24 01:47:52,142 - root - INFO - Log file: ..\outputs\logs\embedding_generation_cuda_20251024_014752.log
+2025-10-24 01:47:52,154 - __main__ - INFO - Device: cuda
+2025-10-24 01:47:52,156 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti Laptop GPU
+2025-10-24 01:47:52,156 - __main__ - INFO - GPU Memory: 12.8GB
+2025-10-24 01:47:52,156 - __main__ - INFO - cuDNN benchmark enabled
+2025-10-24 01:47:52,156 - __main__ - INFO - TensorFloat32 matmul enabled
+2025-10-24 01:47:52,156 - __main__ - INFO - 
+======================================================================
+2025-10-24 01:47:52,165 - __main__ - INFO - MODEL: ESM2_650M
+2025-10-24 01:47:52,165 - __main__ - INFO - ======================================================================
+2025-10-24 01:47:52,165 - __main__ - INFO - Loading esm2_650m...
+2025-10-24 01:47:53,708 - __main__ - INFO - Half precision (fp16) enabled
+2025-10-24 01:47:53,709 - __main__ - INFO - torch.compile() disabled (Windows)
+2025-10-24 01:47:53,709 - __main__ - INFO - 
+Processing: ..\data\train_sequences.fasta
+2025-10-24 01:47:54,069 - __main__ - INFO - Read 82,404 sequences from ..\data\train_sequences.fasta
+2025-10-24 03:52:36,240 - __main__ - INFO - Reordering embeddings to original order...
+2025-10-24 03:52:37,190 - __main__ - INFO - Saved embeddings: (82404, 1280)
+2025-10-24 03:52:37,221 - __main__ - INFO - 
+======================================================================
+2025-10-24 03:52:37,222 - __main__ - INFO - PERFORMANCE SUMMARY: esm2_650m
+2025-10-24 03:52:37,222 - __main__ - INFO - ======================================================================
+2025-10-24 03:52:37,222 - __main__ - INFO - Total proteins: 82,404
+2025-10-24 03:52:37,222 - __main__ - INFO - Total batches: 5,151 (warmup: 3)
+2025-10-24 03:52:37,222 - __main__ - INFO - Total time: 7482.10s (124.7m)
+2025-10-24 03:52:37,222 - __main__ - INFO - 
+Throughput:
+2025-10-24 03:52:37,223 - __main__ - INFO -   Proteins/sec: 11.0
+2025-10-24 03:52:37,223 - __main__ - INFO -   Batches/sec: 0.69
+2025-10-24 03:52:37,223 - __main__ - INFO -   Tokens/sec: 5790.8
+2025-10-24 03:52:37,223 - __main__ - INFO - 
+Batch timing:
+2025-10-24 03:52:37,224 - __main__ - INFO -   Average: 1.450s
+2025-10-24 03:52:37,224 - __main__ - INFO -   Std dev: 5.434s
+2025-10-24 03:52:37,224 - __main__ - INFO -   Min: 0.024s
+2025-10-24 03:52:37,225 - __main__ - INFO -   Max: 75.002s
+2025-10-24 03:52:37,225 - __main__ - INFO - 
+Memory usage:
+2025-10-24 03:52:37,225 - __main__ - INFO -   Peak: 1.34GB
+2025-10-24 03:52:37,225 - __main__ - INFO -   Average: 1.34GB
+2025-10-24 03:52:37,225 - __main__ - INFO -   Utilization: 10.4%
+2025-10-24 03:52:37,225 - __main__ - INFO - ======================================================================
+
+2025-10-24 03:52:37,374 - __main__ - INFO - 
+Processing: ..\data\testsuperset.fasta
+2025-10-24 03:52:38,311 - __main__ - INFO - Read 224,309 sequences from ..\data\testsuperset.fasta
+2025-10-24 06:33:32,854 - __main__ - INFO - Reordering embeddings to original order...
+2025-10-24 06:33:35,195 - __main__ - INFO - Saved embeddings: (224309, 1280)
+2025-10-24 06:33:35,235 - __main__ - INFO - 
+======================================================================
+2025-10-24 06:33:35,235 - __main__ - INFO - PERFORMANCE SUMMARY: esm2_650m
+2025-10-24 06:33:35,235 - __main__ - INFO - ======================================================================
+2025-10-24 06:33:35,236 - __main__ - INFO - Total proteins: 224,309
+2025-10-24 06:33:35,236 - __main__ - INFO - Total batches: 14,020 (warmup: 6)
+2025-10-24 06:33:35,236 - __main__ - INFO - Total time: 9654.47s (160.9m)
+2025-10-24 06:33:35,236 - __main__ - INFO - 
+Throughput:
+2025-10-24 06:33:35,236 - __main__ - INFO -   Proteins/sec: 23.2
+2025-10-24 06:33:35,236 - __main__ - INFO -   Batches/sec: 1.45
+2025-10-24 06:33:35,236 - __main__ - INFO -   Tokens/sec: 9972.6
+2025-10-24 06:33:35,236 - __main__ - INFO - 
+Batch timing:
+2025-10-24 06:33:35,236 - __main__ - INFO -   Average: 0.892s
+2025-10-24 06:33:35,236 - __main__ - INFO -   Std dev: 3.541s
+2025-10-24 06:33:35,236 - __main__ - INFO -   Min: 0.022s
+2025-10-24 06:33:35,237 - __main__ - INFO -   Max: 75.002s
+2025-10-24 06:33:35,237 - __main__ - INFO - 
+Memory usage:
+2025-10-24 06:33:35,237 - __main__ - INFO -   Peak: 1.34GB
+2025-10-24 06:33:35,237 - __main__ - INFO -   Average: 1.33GB
+2025-10-24 06:33:35,237 - __main__ - INFO -   Utilization: 10.4%
+2025-10-24 06:33:35,237 - __main__ - INFO - ======================================================================
+
+2025-10-24 06:33:35,504 - __main__ - INFO - 
+======================================================================
+2025-10-24 06:33:35,506 - __main__ - INFO - MODEL: ESM2_3B
+2025-10-24 06:33:35,506 - __main__ - INFO - ======================================================================
+2025-10-24 06:33:35,506 - __main__ - INFO - Loading esm2_3b...
+2025-10-24 06:33:45,599 - __main__ - INFO - Half precision (fp16) enabled
+2025-10-24 06:33:45,600 - __main__ - INFO - torch.compile() disabled (Windows)
+2025-10-24 06:33:45,600 - __main__ - INFO - 
+Processing: ..\data\train_sequences.fasta
+2025-10-24 06:33:46,004 - __main__ - INFO - Read 82,404 sequences from ..\data\train_sequences.fasta
+2025-10-24 08:53:23,016 - __main__ - INFO - Reordering embeddings to original order...
+2025-10-24 08:53:24,764 - __main__ - INFO - Saved embeddings: (82404, 2560)
+2025-10-24 08:53:24,778 - __main__ - INFO - 
+======================================================================
+2025-10-24 08:53:24,778 - __main__ - INFO - PERFORMANCE SUMMARY: esm2_3b
+2025-10-24 08:53:24,778 - __main__ - INFO - ======================================================================
+2025-10-24 08:53:24,778 - __main__ - INFO - Total proteins: 82,404
+2025-10-24 08:53:24,778 - __main__ - INFO - Total batches: 20,601 (warmup: 3)
+2025-10-24 08:53:24,779 - __main__ - INFO - Total time: 8376.98s (139.6m)
+2025-10-24 08:53:24,779 - __main__ - INFO - 
+Throughput:
+2025-10-24 08:53:24,779 - __main__ - INFO -   Proteins/sec: 9.8
+2025-10-24 08:53:24,779 - __main__ - INFO -   Batches/sec: 2.46
+2025-10-24 08:53:24,779 - __main__ - INFO -   Tokens/sec: 5172.2
+2025-10-24 08:53:24,779 - __main__ - INFO - 
+Batch timing:
+2025-10-24 08:53:24,779 - __main__ - INFO -   Average: 0.405s
+2025-10-24 08:53:24,779 - __main__ - INFO -   Std dev: 0.282s
+2025-10-24 08:53:24,779 - __main__ - INFO -   Min: 0.026s
+2025-10-24 08:53:24,779 - __main__ - INFO -   Max: 3.398s
+2025-10-24 08:53:24,779 - __main__ - INFO - 
+Memory usage:
+2025-10-24 08:53:24,779 - __main__ - INFO -   Peak: 5.78GB
+2025-10-24 08:53:24,779 - __main__ - INFO -   Average: 5.77GB
+2025-10-24 08:53:24,779 - __main__ - INFO -   Utilization: 45.1%
+2025-10-24 08:53:24,779 - __main__ - INFO - ======================================================================
+
+2025-10-24 08:53:24,950 - __main__ - INFO - 
+Processing: ..\data\testsuperset.fasta
+2025-10-24 08:53:25,824 - __main__ - INFO - Read 224,309 sequences from ..\data\testsuperset.fasta
+2025-10-24 14:10:23,815 - __main__ - INFO - Reordering embeddings to original order...
+2025-10-24 14:10:28,703 - __main__ - INFO - Saved embeddings: (224309, 2560)
+2025-10-24 14:10:28,748 - __main__ - INFO - 
+======================================================================
+2025-10-24 14:10:28,748 - __main__ - INFO - PERFORMANCE SUMMARY: esm2_3b
+2025-10-24 14:10:28,748 - __main__ - INFO - ======================================================================
+2025-10-24 14:10:28,749 - __main__ - INFO - Total proteins: 224,309
+2025-10-24 14:10:28,749 - __main__ - INFO - Total batches: 56,078 (warmup: 6)
+2025-10-24 14:10:28,749 - __main__ - INFO - Total time: 19017.92s (317.0m)
+2025-10-24 14:10:28,749 - __main__ - INFO - 
+Throughput:
+2025-10-24 14:10:28,749 - __main__ - INFO -   Proteins/sec: 11.8
+2025-10-24 14:10:28,749 - __main__ - INFO -   Batches/sec: 2.95
+2025-10-24 14:10:28,749 - __main__ - INFO -   Tokens/sec: 5062.6
+2025-10-24 14:10:28,749 - __main__ - INFO - 
+Batch timing:
+2025-10-24 14:10:28,749 - __main__ - INFO -   Average: 0.355s
+2025-10-24 14:10:28,749 - __main__ - INFO -   Std dev: 0.270s
+2025-10-24 14:10:28,749 - __main__ - INFO -   Min: 0.025s
+2025-10-24 14:10:28,749 - __main__ - INFO -   Max: 3.398s
+2025-10-24 14:10:28,749 - __main__ - INFO - 
+Memory usage:
+2025-10-24 14:10:28,749 - __main__ - INFO -   Peak: 5.78GB
+2025-10-24 14:10:28,749 - __main__ - INFO -   Average: 5.77GB
+2025-10-24 14:10:28,750 - __main__ - INFO -   Utilization: 45.1%
+2025-10-24 14:10:28,750 - __main__ - INFO - ======================================================================
+
+2025-10-24 14:10:29,308 - __main__ - INFO - 
+======================================================================
+2025-10-24 14:10:29,308 - __main__ - INFO - MODEL: PROTBERT
+2025-10-24 14:10:29,308 - __main__ - INFO - ======================================================================
+2025-10-24 14:10:29,308 - __main__ - INFO - Loading protbert...
+2025-10-24 14:10:32,140 - __main__ - INFO - Half precision (fp16) enabled
+2025-10-24 14:10:32,141 - __main__ - INFO - torch.compile() disabled (Windows)
+2025-10-24 14:10:32,141 - __main__ - INFO - 
+Processing: ..\data\train_sequences.fasta
+2025-10-24 14:10:32,507 - __main__ - INFO - Read 82,404 sequences from ..\data\train_sequences.fasta
+2025-10-24 14:41:56,923 - __main__ - INFO - Reordering embeddings to original order...
+2025-10-24 14:41:57,631 - __main__ - INFO - Saved embeddings: (82404, 1024)
+2025-10-24 14:41:57,644 - __main__ - INFO - 
+======================================================================
+2025-10-24 14:41:57,644 - __main__ - INFO - PERFORMANCE SUMMARY: protbert
+2025-10-24 14:41:57,644 - __main__ - INFO - ======================================================================
+2025-10-24 14:41:57,644 - __main__ - INFO - Total proteins: 82,404
+2025-10-24 14:41:57,644 - __main__ - INFO - Total batches: 6,867 (warmup: 3)
+2025-10-24 14:41:57,644 - __main__ - INFO - Total time: 1884.39s (31.4m)
+2025-10-24 14:41:57,644 - __main__ - INFO - 
+Throughput:
+2025-10-24 14:41:57,645 - __main__ - INFO -   Proteins/sec: 43.7
+2025-10-24 14:41:57,645 - __main__ - INFO -   Batches/sec: 3.64
+2025-10-24 14:41:57,645 - __main__ - INFO -   Tokens/sec: 22992.6
+2025-10-24 14:41:57,645 - __main__ - INFO - 
+Batch timing:
+2025-10-24 14:41:57,645 - __main__ - INFO -   Average: 0.273s
+2025-10-24 14:41:57,645 - __main__ - INFO -   Std dev: 0.450s
+2025-10-24 14:41:57,645 - __main__ - INFO -   Min: 0.015s
+2025-10-24 14:41:57,645 - __main__ - INFO -   Max: 12.006s
+2025-10-24 14:41:57,645 - __main__ - INFO - 
+Memory usage:
+2025-10-24 14:41:57,645 - __main__ - INFO -   Peak: 0.85GB
+2025-10-24 14:41:57,645 - __main__ - INFO -   Average: 0.85GB
+2025-10-24 14:41:57,645 - __main__ - INFO -   Utilization: 6.6%
+2025-10-24 14:41:57,645 - __main__ - INFO - ======================================================================
+
+2025-10-24 14:41:57,760 - __main__ - INFO - 
+Processing: ..\data\testsuperset.fasta
+2025-10-24 14:41:58,617 - __main__ - INFO - Read 224,309 sequences from ..\data\testsuperset.fasta
+2025-10-24 15:43:24,209 - __main__ - INFO - Reordering embeddings to original order...
+2025-10-24 15:43:26,244 - __main__ - INFO - Saved embeddings: (224309, 1024)
+2025-10-24 15:43:26,291 - __main__ - INFO - 
+======================================================================
+2025-10-24 15:43:26,292 - __main__ - INFO - PERFORMANCE SUMMARY: protbert
+2025-10-24 15:43:26,292 - __main__ - INFO - ======================================================================
+2025-10-24 15:43:26,293 - __main__ - INFO - Total proteins: 224,309
+2025-10-24 15:43:26,293 - __main__ - INFO - Total batches: 18,693 (warmup: 6)
+2025-10-24 15:43:26,293 - __main__ - INFO - Total time: 3685.52s (61.4m)
+2025-10-24 15:43:26,294 - __main__ - INFO - 
+Throughput:
+2025-10-24 15:43:26,294 - __main__ - INFO -   Proteins/sec: 60.9
+2025-10-24 15:43:26,294 - __main__ - INFO -   Batches/sec: 5.07
+2025-10-24 15:43:26,295 - __main__ - INFO -   Tokens/sec: 26123.9
+2025-10-24 15:43:26,296 - __main__ - INFO - 
+Batch timing:
+2025-10-24 15:43:26,296 - __main__ - INFO -   Average: 0.216s
+2025-10-24 15:43:26,296 - __main__ - INFO -   Std dev: 0.290s
+2025-10-24 15:43:26,297 - __main__ - INFO -   Min: 0.015s
+2025-10-24 15:43:26,297 - __main__ - INFO -   Max: 12.006s
+2025-10-24 15:43:26,297 - __main__ - INFO - 
+Memory usage:
+2025-10-24 15:43:26,297 - __main__ - INFO -   Peak: 0.85GB
+2025-10-24 15:43:26,298 - __main__ - INFO -   Average: 0.85GB
+2025-10-24 15:43:26,298 - __main__ - INFO -   Utilization: 6.6%
+2025-10-24 15:43:26,298 - __main__ - INFO - ======================================================================
+
+2025-10-24 15:43:26,596 - __main__ - INFO - 
+======================================================================
+2025-10-24 15:43:26,596 - __main__ - INFO - MODEL: ANKH
+2025-10-24 15:43:26,597 - __main__ - INFO - ======================================================================
+2025-10-24 15:43:26,597 - __main__ - INFO - Loading ankh...
+2025-10-24 15:43:35,637 - __main__ - INFO - Half precision (fp16) enabled
+2025-10-24 15:43:35,638 - __main__ - INFO - torch.compile() disabled (Windows)
+2025-10-24 15:43:35,638 - __main__ - INFO - 
+Processing: ..\data\train_sequences.fasta
+2025-10-24 15:43:36,015 - __main__ - INFO - Read 82,404 sequences from ..\data\train_sequences.fasta
+2025-10-24 15:43:36,255 - __main__ - ERROR - Failed to process batch 0: You have to specify either decoder_input_ids or decoder_inputs_embeds
+2025-10-24 15:43:36,255 - __main__ - ERROR - Failed to process model ankh: You have to specify either decoder_input_ids or decoder_inputs_embeds
+2025-10-24 15:43:36,581 - __main__ - INFO - 
+Performance report saved: ..\outputs\embedding_performance_report_cuda.json
+2025-10-24 15:43:36,581 - __main__ - INFO - 
+======================================================================
+2025-10-24 15:43:36,581 - __main__ - INFO - ALL EMBEDDINGS COMPLETE
+2025-10-24 15:43:36,581 - __main__ - INFO - ======================================================================

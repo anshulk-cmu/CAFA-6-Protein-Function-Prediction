@@ -5,7 +5,7 @@ from pathlib import Path
 def analyze_embeddings():
     emb_dir = Path("../embeddings")
     
-    models = ['esm2_650m', 'esm2_3b', 'protbert', 'ankh']
+    models = ['esm2_650m', 'esm2_3b', 'protbert', 'prott5']
     datasets = ['train', 'test']
     
     print("="*70)
