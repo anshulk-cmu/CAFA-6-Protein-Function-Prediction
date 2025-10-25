@@ -4,9 +4,8 @@ Competition: [CAFA 6 Protein Function Prediction](https://www.kaggle.com/competi
 
 ## Project Overview
 Multi-model hierarchical ensemble approach for protein function prediction using:
-- ESM-2 (3B & 650M) embeddings
-- ProtBERT-BFD embeddings  
-- Ankh Large embeddings
+- ESM-2 (3B, 650M & 150M) embeddings
+- ProtBERT-BFD embeddings
 - Graph Neural Networks on GO hierarchy
 - Asymmetric Loss for class imbalance
 
@@ -85,8 +84,13 @@ cafa6_project/
 ├── scripts/                       # Python scripts
 │   ├── test_setup.py
 │   ├── generate_embeddings.py
-│   └── concat_embeddings.py
+│   ├── concat_embeddings.py
+│   ├── profile_embeddings.py
+│   ├── gpu_monitor.py
+│   └── analyze_gpu_logs.py
 ├── outputs/                       # Final submissions
+│   └── logs/                      # Execution logs
+├── config.yaml                    # Centralized configuration
 ├── requirements.txt
 └── README.md
 ```
@@ -106,17 +110,13 @@ cafa6_project/
   - All GO terms and ontology files present
 
 ### 🔄 In Progress (Phase 1: Feature Engineering)
-- [x] ESM-2 650M Training Set: **17% complete** (871/5,151 batches)
-  - Started: Oct 19, 2025 12:50 AM
-  - ETA: ~1h 37m remaining for train
-  - GPU: 100% utilization, 60°C
-- [ ] ESM-2 650M Test Set: ~2.5h (queued)
-- [ ] ESM-2 3B: ~6-7h (queued)
-- [ ] ProtBERT: ~2h (queued)
-- [ ] Ankh Large: ~2h (queued)
+- [ ] ESM-2 650M: ~4h (batch_size=16)
+- [ ] ESM-2 3B: ~6-7h (batch_size=4)
+- [ ] ProtBERT: ~2h (batch_size=12)
+- [ ] ESM-2 150M: ~1.5h (batch_size=24)
 - [ ] Concatenate embeddings: ~5 min (final step)
 
-**Total Phase 1 ETA:** ~14-15 hours (completes ~3-4 PM Oct 19)
+**Total Phase 1 ETA:** ~13-14 hours
 
 ### 📋 Upcoming (Phase 2+)
 - [ ] Phase 2: Model Architecture (Week 2-3)
@@ -146,6 +146,33 @@ nvidia-smi -l 30
 ls ..\embeddings\
 ```
 
+## Configuration Management
+
+All project settings are centralized in `config.yaml`:
+
+### Model Configuration
+- Model names and HuggingFace identifiers
+- Batch sizes optimized for RTX 5070 Ti (12GB VRAM)
+- Embedding dimensions for each model
+
+### Optimization Settings
+- `use_compile`: torch.compile() for kernel fusion (Linux/Mac only)
+- `use_amp`: Automatic mixed precision (fp16)
+- `use_half`: Load models in half precision
+- `cudnn_benchmark`: Auto-tune cuDNN kernels
+- `tf32_matmul`: TensorFloat32 for faster matrix operations
+- `cache_clear_interval`: Memory management
+
+### Selective Model Execution
+Run specific models instead of all four:
+```powershell
+# Run only fast models
+python generate_embeddings.py --models esm2_650m esm2_150m
+
+# Run only large model
+python generate_embeddings.py --models esm2_3b
+```
+
 ## Phase 1: Feature Engineering (Next Steps)
 
 ### 1. Download Data
@@ -161,14 +188,14 @@ python generate_embeddings.py  # Takes 6-8 hours
 - ESM-2 3B: ~11GB VRAM, batch_size=4
 - ESM-2 650M: ~8GB VRAM, batch_size=16
 - ProtBERT: ~6GB VRAM, batch_size=12
-- Ankh: ~6GB VRAM, batch_size=12
+- ESM-2 150M: ~4GB VRAM, batch_size=24
 
 ### 3. Concatenate Embeddings
 ```powershell
 python concat_embeddings.py  # Takes ~5 minutes
 ```
 
-**Output:** 4,500-dimensional feature vectors per protein
+**Output:** 4,224-dimensional feature vectors per protein (1280 + 1280 + 1024 + 640)
 
 ## Troubleshooting
 
@@ -185,14 +212,17 @@ pip install --pre torch torchvision --index-url https://download.pytorch.org/whl
 ```
 
 ### Out of Memory (OOM) Errors
-Reduce batch sizes in `generate_embeddings.py`:
-```python
-models = [
-    ('esm2_650m', 8),   # Reduce from 16
-    ('esm2_3b', 2),     # Reduce from 4
-    ('protbert', 8),    # Reduce from 12
-    ('ankh', 8)         # Reduce from 12
-]
+Reduce batch sizes in `config.yaml`:
+```yaml
+models:
+  esm2_650m:
+    batch_size: 8   # Reduce from 16
+  esm2_3b:
+    batch_size: 2   # Reduce from 4
+  protbert:
+    batch_size: 8   # Reduce from 12
+  esm2_150m:
+    batch_size: 12  # Reduce from 24
 ```
 
 ### CUDA Not Available
@@ -205,11 +235,11 @@ Should show CUDA 12.8+ for RTX 5070 Ti.
 ## Technical Approach Summary
 
 ### Multi-Model Embedding Fusion
-- **ESM-2 3B**: 1,280-dim (global context)
-- **ESM-2 650M**: 1,280-dim (local patterns)
-- **ProtBERT**: 1,024-dim (domain boundaries)
-- **Ankh Large**: 1,536-dim (specialized families)
-- **Total**: 4,500-dim concatenated features
+- **ESM-2 3B**: 1,280-dim (global context, deep architecture)
+- **ESM-2 650M**: 1,280-dim (local patterns, balanced performance)
+- **ProtBERT**: 1,024-dim (domain boundaries, BERT-based)
+- **ESM-2 150M**: 640-dim (fast inference, efficient encoding)
+- **Total**: 4,224-dim concatenated features
 
 ### Key Innovations
 1. Asymmetric Loss (ASL) for extreme class imbalance
