@@ -20,11 +20,11 @@ models:
     dimensions: 1024
     description: "ProtBERT-BFD - Domain-specific BERT"
 
-  prott5:
-    hf_name: "Rostlab/prot_t5_xl_uniref50"
-    batch_size: 8
-    dimensions: 1024
-    description: "ProtT5-XL - T5-based protein encoder"
+  esm2_150m:
+    hf_name: "facebook/esm2_t30_150M_UR50D"
+    batch_size: 24
+    dimensions: 640
+    description: "ESM-2 150M - Fast and efficient encoder"
 
 paths:
   data_dir: "../data"

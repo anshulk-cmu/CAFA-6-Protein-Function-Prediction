@@ -5,7 +5,7 @@ from pathlib import Path
 
 def concatenate_embeddings(emb_dir, prefix):
     """Concatenate embeddings from multiple models with validation"""
-    models = ['esm2_650m', 'esm2_3b', 'protbert', 'prott5']
+    models = ['esm2_650m', 'esm2_3b', 'protbert', 'esm2_150m']
 
     print(f"\nConcatenating {prefix.upper()} embeddings...")
     start_time = time.time()

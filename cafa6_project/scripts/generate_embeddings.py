@@ -56,16 +56,14 @@ class ProteinEmbedder:
             if 'esm2' in model_name.lower():
                 if '3b' in model_name.lower():
                     hf_name = "facebook/esm2_t36_3B_UR50D"
+                elif '150m' in model_name.lower():
+                    hf_name = "facebook/esm2_t30_150M_UR50D"
                 else:
                     hf_name = "facebook/esm2_t33_650M_UR50D"
                 self.model = EsmModel.from_pretrained(hf_name)
                 self.tokenizer = EsmTokenizer.from_pretrained(hf_name)
             elif 'protbert' in model_name.lower():
                 hf_name = "Rostlab/prot_bert_bfd"
-                self.model = AutoModel.from_pretrained(hf_name)
-                self.tokenizer = AutoTokenizer.from_pretrained(hf_name)
-            elif 'prott5' in model_name.lower():
-                hf_name = "Rostlab/prot_t5_xl_uniref50"
                 self.model = AutoModel.from_pretrained(hf_name)
                 self.tokenizer = AutoTokenizer.from_pretrained(hf_name)
             else:
@@ -203,70 +201,65 @@ class ProteinEmbedder:
                 # Update progress bar with stats
                 if batch_idx >= warmup_batches and len(self.stats['batch_times']) > 0:
                     avg_batch_time = np.mean(self.stats['batch_times'])
-                    batches_per_sec = 1.0 / avg_batch_time if avg_batch_time > 0 else 0
-                    proteins_per_sec = batches_per_sec * self.batch_size
-
+                    proteins_processed = sum([emb.shape[0] for emb in all_embeddings])
+                    elapsed_time = time.time() - start_time
+                    proteins_per_sec = proteins_processed / elapsed_time if elapsed_time > 0 else 0
+                    
                     pbar.set_postfix({
-                        'batch/s': f'{batches_per_sec:.2f}',
+                        'batch_time': f'{batch_time:.2f}s',
+                        'avg_time': f'{avg_batch_time:.2f}s',
                         'prot/s': f'{proteins_per_sec:.1f}',
-                        'mem_gb': f'{memory_samples[-1]:.1f}' if memory_samples else 'N/A'
+                        'mem': f'{mem_gb:.1f}GB' if self.device == 'cuda' else 'N/A'
                     })
 
-                # Clear CUDA cache periodically
-                if self.device == 'cuda' and batch_idx > 0 and batch_idx % cache_clear_interval == 0:
+                # Clear cache periodically
+                if self.device == 'cuda' and (batch_idx + 1) % cache_clear_interval == 0:
                     torch.cuda.empty_cache()
 
             except Exception as e:
                 self.logger.error(f"Failed to process batch {batch_idx}: {e}")
                 raise
 
-        pbar.close()
-
-        # Calculate total time
+        # Calculate final statistics
         self.stats['total_time'] = time.time() - start_time
         self.stats['total_batches'] = len(dataloader)
-
-        # Calculate memory stats
-        if memory_samples:
-            self.stats['peak_memory_gb'] = max(memory_samples)
-            self.stats['avg_memory_gb'] = np.mean(memory_samples)
-            if self.device == 'cuda':
-                self.stats['total_memory_gb'] = torch.cuda.get_device_properties(0).total_memory / 1e9
-                self.stats['memory_utilization_pct'] = (self.stats['peak_memory_gb'] / self.stats['total_memory_gb']) * 100
-
-        # Reorder embeddings to original sequence order
-        self.logger.info("Reordering embeddings to original order...")
-        original_order = {id_: i for i, id_ in enumerate(ids)}
-        sorted_indices = [original_order[id_] for id_ in all_ids]
-
-        embeddings_array = np.vstack(all_embeddings)
-        reordered_embeddings = np.zeros_like(embeddings_array)
-        for new_idx, orig_idx in enumerate(sorted_indices):
-            reordered_embeddings[orig_idx] = embeddings_array[new_idx]
-
-        # Save embeddings
-        np.save(f"{output_path}_embeddings.npy", reordered_embeddings)
-        np.save(f"{output_path}_ids.npy", np.array(ids))
-
-        self.logger.info(f"Saved embeddings: {reordered_embeddings.shape}")
-
-        # Calculate throughput metrics
-        if self.stats['total_time'] > 0:
+        
+        if len(self.stats['batch_times']) > 0:
+            self.stats['avg_batch_time'] = float(np.mean(self.stats['batch_times']))
+            self.stats['std_batch_time'] = float(np.std(self.stats['batch_times']))
+            self.stats['min_batch_time'] = float(np.min(self.stats['batch_times']))
+            self.stats['max_batch_time'] = float(np.max(self.stats['batch_times']))
+            
+            # Throughput metrics
             self.stats['proteins_per_sec'] = self.stats['total_proteins'] / self.stats['total_time']
             self.stats['batches_per_sec'] = self.stats['total_batches'] / self.stats['total_time']
-
+            
             # Estimate tokens processed
             avg_seq_len = np.mean([len(seq) for seq in sequences])
             total_tokens = self.stats['total_proteins'] * avg_seq_len
             self.stats['tokens_per_sec'] = total_tokens / self.stats['total_time']
-            self.stats['avg_sequence_length'] = avg_seq_len
 
-        # Batch timing statistics
-        if self.stats['batch_times']:
-            self.stats['avg_batch_time'] = np.mean(self.stats['batch_times'])
-            self.stats['std_batch_time'] = np.std(self.stats['batch_times'])
-            self.stats['min_batch_time'] = np.min(self.stats['batch_times'])
-            self.stats['max_batch_time'] = np.max(self.stats['batch_times'])
+        # Memory statistics
+        if memory_samples:
+            self.stats['peak_memory_gb'] = float(np.max(memory_samples))
+            self.stats['avg_memory_gb'] = float(np.mean(memory_samples))
+            if self.device == 'cuda':
+                total_memory = torch.cuda.get_device_properties(0).total_memory / 1e9
+                self.stats['memory_utilization_pct'] = (self.stats['peak_memory_gb'] / total_memory) * 100
+
+        # Concatenate all embeddings
+        embeddings_array = np.vstack(all_embeddings)
+        self.logger.info(f"Reordering embeddings to original order...")
+        
+        # Create mapping from sorted IDs back to original order
+        id_to_embedding = {id_: emb for id_, emb in zip(all_ids, embeddings_array)}
+        reordered_embeddings = np.array([id_to_embedding[id_] for id_ in ids])
+        
+        # Save embeddings and IDs
+        np.save(f"{output_path}_embeddings.npy", reordered_embeddings)
+        np.save(f"{output_path}_ids.npy", np.array(ids))
+        
+        self.logger.info(f"Saved embeddings: {reordered_embeddings.shape}")
 
         # Print summary
         self._print_summary()
@@ -349,7 +342,7 @@ def main():
     parser.add_argument('--config', type=str, default='../config.yaml',
                        help='Path to config file (default: ../config.yaml)')
     parser.add_argument('--models', nargs='+',
-                       choices=['esm2_650m', 'esm2_3b', 'protbert', 'prott5'],
+                       choices=['esm2_650m', 'esm2_3b', 'protbert', 'esm2_150m'],
                        help='Specific models to run (default: all)')
     args = parser.parse_args()
 
@@ -401,7 +394,7 @@ def main():
     if args.models:
         model_names = args.models
     else:
-        model_names = ['esm2_650m', 'esm2_3b', 'protbert', 'prott5']
+        model_names = ['esm2_650m', 'esm2_3b', 'protbert', 'esm2_150m']
 
     # Load model configs
     model_configs = config.get('models', {})
@@ -411,7 +404,7 @@ def main():
             batch_size = model_configs[model_name].get('batch_size', 8)
         else:
             # Default batch sizes
-            batch_sizes = {'esm2_650m': 16, 'esm2_3b': 4, 'protbert': 12, 'prott5': 8}
+            batch_sizes = {'esm2_650m': 16, 'esm2_3b': 4, 'protbert': 12, 'esm2_150m': 24}
             batch_size = batch_sizes.get(model_name, 8)
         configs.append((model_name, batch_size))
 

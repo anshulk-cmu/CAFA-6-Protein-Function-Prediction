@@ -41,16 +41,14 @@ def profile_model(model_name, sequences, ids, batch_size, num_batches, output_pa
     if 'esm2' in model_name.lower():
         if '3b' in model_name.lower():
             hf_name = "facebook/esm2_t36_3B_UR50D"
+        elif '150m' in model_name.lower():
+            hf_name = "facebook/esm2_t30_150M_UR50D"
         else:
             hf_name = "facebook/esm2_t33_650M_UR50D"
         model = EsmModel.from_pretrained(hf_name)
         tokenizer = EsmTokenizer.from_pretrained(hf_name)
     elif 'protbert' in model_name.lower():
         hf_name = "Rostlab/prot_bert_bfd"
-        model = AutoModel.from_pretrained(hf_name)
-        tokenizer = AutoTokenizer.from_pretrained(hf_name)
-    elif 'prott5' in model_name.lower():
-        hf_name = "Rostlab/prot_t5_xl_uniref50"
         model = AutoModel.from_pretrained(hf_name)
         tokenizer = AutoTokenizer.from_pretrained(hf_name)
     else:
@@ -255,7 +253,7 @@ def main():
     parser.add_argument('--fasta', type=str, default='../data/train_sequences.fasta',
                        help='Path to FASTA file')
     parser.add_argument('--model', type=str, default='esm2_650m',
-                       choices=['esm2_650m', 'esm2_3b', 'protbert', 'ankh'],
+                       choices=['esm2_650m', 'esm2_3b', 'protbert', 'esm2_150m'],
                        help='Model to profile')
     parser.add_argument('--batch-size', type=int, default=8,
                        help='Batch size (default: 8)')
