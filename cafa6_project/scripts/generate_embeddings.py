@@ -197,9 +197,18 @@ class ProteinEmbedder:
             'timestamp': time.time()
         }
 
+        # Ensure checkpoint directory exists
+        checkpoint_dir = os.path.dirname(checkpoint_path)
+        if checkpoint_dir and not os.path.exists(checkpoint_dir):
+            os.makedirs(checkpoint_dir, exist_ok=True)
+
         temp_path = f"{checkpoint_path}.tmp"
         np.save(temp_path, checkpoint, allow_pickle=True)
-        os.rename(temp_path, checkpoint_path)  # Atomic operation
+
+        # On Windows, os.rename() fails if destination exists, so remove first
+        if os.path.exists(checkpoint_path):
+            os.remove(checkpoint_path)
+        os.rename(temp_path, checkpoint_path)
 
     def load_checkpoint(self, checkpoint_path):
         """Load checkpoint if exists"""
@@ -526,13 +535,17 @@ def main():
             torch.set_float32_matmul_precision('high')
             logger.info("TensorFloat32 matmul enabled")
 
-    # Setup paths
+    # Setup paths and ensure directories exist
     data_dir = Path(config.get('paths', {}).get('data_dir', '../data'))
     emb_dir = Path(config.get('paths', {}).get('embeddings_dir', '../embeddings'))
     outputs_dir = Path(config.get('paths', {}).get('outputs_dir', '../outputs'))
 
+    # Create directories if they don't exist (critical for checkpoint saves)
     emb_dir.mkdir(parents=True, exist_ok=True)
     outputs_dir.mkdir(parents=True, exist_ok=True)
+
+    logger.info(f"Embeddings directory: {emb_dir.absolute()}")
+    logger.info(f"Outputs directory: {outputs_dir.absolute()}")
 
     train_fasta = data_dir / config.get('datasets', {}).get('train', {}).get('filename', 'train_sequences.fasta')
     test_fasta = data_dir / config.get('datasets', {}).get('test', {}).get('filename', 'testsuperset.fasta')
