@@ -12,8 +12,32 @@ import yaml
 import json
 import time
 import logging
+import random
 from datetime import datetime
 from pathlib import Path
+
+def set_seed(seed, deterministic=False):
+    """
+    Set random seeds for reproducibility across all libraries.
+
+    Args:
+        seed: Random seed value
+        deterministic: If True, sets PyTorch to fully deterministic mode (slower)
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    if deterministic:
+        # Full determinism (slower but 100% reproducible)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+        torch.use_deterministic_algorithms(True)
+    else:
+        # Balanced approach: reproducible but allows some non-deterministic optimizations
+        torch.backends.cudnn.deterministic = False
+        torch.backends.cudnn.benchmark = True
 
 class ProteinDataset(Dataset):
     def __init__(self, sequences, ids):
@@ -359,6 +383,12 @@ def main():
     # Setup logging
     logger = setup_logging(config, args)
 
+    # Set random seeds for reproducibility
+    seed = config.get('reproducibility', {}).get('seed', 42)
+    deterministic = config.get('reproducibility', {}).get('cudnn_deterministic', False)
+    set_seed(seed, deterministic)
+    logger.info(f"Random seed set to {seed} (deterministic={deterministic})")
+
     # Check device availability
     if args.device == 'cuda' and not torch.cuda.is_available():
         logger.error("CUDA requested but not available. Falling back to CPU.")
@@ -370,10 +400,13 @@ def main():
         logger.info(f"GPU: {torch.cuda.get_device_name(0)}")
         logger.info(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f}GB")
 
-        # Apply CUDA optimizations
-        if config.get('optimization', {}).get('cudnn_benchmark', True):
+        # Apply CUDA optimizations (respecting reproducibility settings)
+        cudnn_benchmark = config.get('reproducibility', {}).get('cudnn_benchmark', True)
+        if cudnn_benchmark and not deterministic:
             torch.backends.cudnn.benchmark = True
             logger.info("cuDNN benchmark enabled")
+        elif deterministic:
+            logger.info("cuDNN benchmark disabled (deterministic mode)")
 
         if config.get('optimization', {}).get('tf32_matmul', True):
             torch.set_float32_matmul_precision('high')
