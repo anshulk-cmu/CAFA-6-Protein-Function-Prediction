@@ -1,0 +1,24 @@
+paths:
+  data_dir: "/data/user_data/anshulk/cafa6/data/"
+  raw_train_sequences: "train_sequences.fasta"
+  raw_test_sequences: "testsuperset.fasta"
+  output_dir: "/data/user_data/anshulk/cafa6/embeddings/"
+  log_dir: "/data/user_data/anshulk/cafa6/logs/"
+
+run_params:
+  batch_size: 8  # Smaller batch for T5 models (3B params each)
+  save_every_n_batches: 100
+  seed: 42
+
+models:
+  prot_t5_xl:
+    name: "Rostlab/prot_t5_xl_uniref50"
+    device: 0
+    repo_id: "t5"
+    output_key: "prot_t5_xl"
+  
+  prost_t5:
+    name: "Rostlab/ProstT5"
+    device: 0
+    repo_id: "t5"
+    output_key: "prost_t5"
