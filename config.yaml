@@ -17,11 +17,11 @@ models:
     repo_id: "esm2"
     output_key: "esm2_3b"
   
-  ankh_large:
-    name: "ElnaggarLab/ankh-large"
+  esm_c_600m:
+    name: "EvolutionaryScale/esm-cambrian-600m"
     device: 1
-    repo_id: "ankh"
-    output_key: "ankh_large"
+    repo_id: "esm"
+    output_key: "esm_c_600m"
   
   prot_t5_xl:
     name: "Rostlab/prot_t5_xl_uniref50"
