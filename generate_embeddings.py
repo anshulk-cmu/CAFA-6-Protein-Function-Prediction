@@ -8,6 +8,7 @@ from pathlib import Path
 from tqdm import tqdm
 import numpy as np
 import torch
+import gc
 import torch.multiprocessing as mp
 from transformers import AutoTokenizer, AutoModel
 
@@ -201,6 +202,7 @@ def worker_fn(model_key, config, data_list, data_key, seed):
     logger.info(f"Worker {worker_name} finished")
     del model, tokenizer
     torch.cuda.empty_cache()
+    gc.collect()
 
 def main(config_path):
     try:
