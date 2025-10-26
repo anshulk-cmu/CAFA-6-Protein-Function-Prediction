@@ -9,7 +9,7 @@ from tqdm import tqdm
 import numpy as np
 import torch
 import torch.multiprocessing as mp
-from transformers import AutoTokenizer, AutoModel, T5EncoderModel
+from transformers import AutoTokenizer, AutoModel
 
 def set_seed(seed):
     random.seed(seed)
@@ -45,17 +45,10 @@ def setup_logging(log_dir, worker_name=None):
     
     return logger
 
-def get_model_and_tokenizer(model_name, repo_id, device):
-    if repo_id == 't5':
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = T5EncoderModel.from_pretrained(model_name)
-    elif repo_id == 'ankh':
-        tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        model = AutoModel.from_pretrained(model_name, trust_remote_code=True)
-    else:
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModel.from_pretrained(model_name)
-    
+def get_model_and_tokenizer(model_name, device):
+    """Load encoder-only ESM models (ESM2, ESM-C, ESM-1b)"""
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name)
     model = model.to(device).eval().half()
     return model, tokenizer
 
@@ -114,7 +107,7 @@ def worker_fn(model_key, config, data_list, data_key, seed):
     chk_path = output_dir / f"{output_filename}.chk"
     
     try:
-        model, tokenizer = get_model_and_tokenizer(model_name, model_config['repo_id'], device)
+        model, tokenizer = get_model_and_tokenizer(model_name, device)
         logger.info("Model loaded successfully")
     except Exception as e:
         logger.error(f"Failed to load model: {e}")
@@ -163,11 +156,7 @@ def worker_fn(model_key, config, data_list, data_key, seed):
                 ).to(device)
                 
                 outputs = model(**inputs)
-                
-                if model_config['repo_id'] == 't5':
-                    hidden_state = outputs.last_hidden_state
-                else:
-                    hidden_state = outputs.last_hidden_state
+                hidden_state = outputs.last_hidden_state
                 
                 mean_embeddings = get_mean_embedding(hidden_state, inputs['attention_mask'])
                 all_embeddings.append(mean_embeddings.detach().cpu().half())
@@ -221,7 +210,7 @@ def main(config_path):
     
     config = load_config(config_path)
     logger = setup_logging(config['paths']['log_dir'])
-    logger.info("Embedding generation started")
+    logger.info("Embedding generation started - Encoder-only models (ESM)")
     logger.info(f"Config loaded from {config_path}")
     
     seed = config['run_params'].get('seed', 42)
@@ -241,9 +230,10 @@ def main(config_path):
     
     logger.info(f"Train: {len(train_data)} sequences, Test: {len(test_data)} sequences")
     
+    # Group encoder-only models by GPU
     model_groups = [
-        ['esm2_3B', 'esm_c_600m'],
-        ['prot_t5_xl', 'prot_bert_bfd']
+        ['esm2_3B', 'esm_c_600m'],  # GPU 0 and GPU 1
+        ['esm1b']                   # GPU 1 only (runs alone after first group)
     ]
     
     for group_idx, group in enumerate(model_groups, 1):
@@ -273,10 +263,10 @@ def main(config_path):
         
         logger.info(f"Completed model group {group_idx}/{len(model_groups)}")
     
-    logger.info("Embedding generation finished")
+    logger.info("Encoder-only embedding generation finished")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="CAFA-6 Embedding Generation")
+    parser = argparse.ArgumentParser(description="CAFA-6 Encoder-Only Embedding Generation")
     parser.add_argument("--config", type=str, default="config.yaml", help="Path to config file")
     args = parser.parse_args()
     main(args.config)
