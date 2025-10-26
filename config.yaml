@@ -18,7 +18,7 @@ models:
     output_key: "esm2_3b"
   
   esm_c_600m:
-    name: "EvolutionaryScale/esm-cambrian-600m"
+    name: "Synthyra/ESMplusplus_large"
     device: 1
     repo_id: "esm"
     output_key: "esm_c_600m"
