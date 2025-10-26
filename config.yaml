@@ -1,0 +1,36 @@
+paths:
+  data_dir: "/data/user_data/anshulk/cafa6/data/"
+  raw_train_sequences: "train_sequences.fasta"
+  raw_test_sequences: "testsuperset.fasta"
+  output_dir: "/data/user_data/anshulk/cafa6/embeddings/"
+  log_dir: "/data/user_data/anshulk/cafa6/logs/"
+
+run_params:
+  batch_size: 16
+  save_every_n_batches: 100
+  seed: 42
+
+models:
+  esm2_3B:
+    name: "facebook/esm2_t36_3B_UR50D"
+    device: 0
+    repo_id: "esm2"
+    output_key: "esm2_3b"
+  
+  ankh_large:
+    name: "ElnaggarLab/ankh-large"
+    device: 1
+    repo_id: "ankh"
+    output_key: "ankh_large"
+  
+  prot_t5_xl:
+    name: "Rostlab/prot_t5_xl_uniref50"
+    device: 0
+    repo_id: "t5"
+    output_key: "prot_t5_xl"
+  
+  prot_bert_bfd:
+    name: "Rostlab/prot_bert_bfd"
+    device: 1
+    repo_id: "bert"
+    output_key: "prot_bert_bfd"
