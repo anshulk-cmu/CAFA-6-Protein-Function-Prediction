@@ -158,7 +158,7 @@ pkill -f generate_embeddings.py || true
 sleep 2
 
 # Force GPU memory cleanup using Python
-python -c "import torch; torch.cuda.empty_cache(); print('PyTorch cache cleared')"
+python -c "import torch; import gc; torch.cuda.empty_cache(); gc.collect(); print('GPU memory cleared')"
 
 # Reset GPU if needed (this requires nvidia-smi)
 nvidia-smi --gpu-reset || echo "GPU reset not available (requires root), continuing..."
