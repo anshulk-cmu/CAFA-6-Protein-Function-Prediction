@@ -242,7 +242,7 @@ def main(config_path):
     logger.info(f"Train: {len(train_data)} sequences, Test: {len(test_data)} sequences")
     
     model_groups = [
-        ['esm2_3B', 'ankh_large'],
+        ['esm2_3B', 'esm_c_600m'],
         ['prot_t5_xl', 'prot_bert_bfd']
     ]
     
