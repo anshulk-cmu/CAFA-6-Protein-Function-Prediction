@@ -29,8 +29,8 @@ models:
     repo_id: "t5"
     output_key: "prot_t5_xl"
   
-  prot_bert_bfd:
-    name: "Rostlab/prot_bert_bfd"
+  esm1b:
+    name: "facebook/esm1b_t33_650M_UR50S"
     device: 1
-    repo_id: "bert"
-    output_key: "prot_bert_bfd"
+    repo_id: "esm1b"
+    output_key: "esm1b"
