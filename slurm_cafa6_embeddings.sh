@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=cafa6_emb_full
 #SBATCH --partition=general
-#SBATCH --gres=gpu:L40S:2
+#SBATCH --gres=gpu:A6000:2
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
 #SBATCH --time=36:00:00
