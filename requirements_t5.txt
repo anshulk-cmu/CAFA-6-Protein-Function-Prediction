@@ -1,0 +1,24 @@
+# T5 Embedding Generation Requirements
+# For ProtT5-XL and ProstT5 encoder-only models
+# Optimized for A6000 48GB GPUs
+
+# Core deep learning
+torch>=2.0.0
+transformers>=4.35.0
+
+# Tokenization and serialization
+sentencepiece>=0.1.99
+protobuf>=3.20.0,<4.0.0  # Critical for sentencepiece compatibility
+
+# Data handling
+numpy>=1.24.0
+pyyaml>=6.0
+
+# Progress and monitoring
+tqdm>=4.65.0
+
+# System monitoring (optional but recommended)
+psutil>=5.9.0
+
+# GPU utilities (optional)
+pynvml>=11.5.0
