@@ -6,19 +6,19 @@ paths:
   log_dir: "/data/user_data/anshulk/cafa6/logs/"
 
 run_params:
-  batch_size: 8  # Smaller batch for T5 models (3B params each)
+  batch_size: 32  # Optimized for A6000 48GB - encoder-only models
   save_every_n_batches: 100
   seed: 42
 
 models:
   prot_t5_xl:
-    name: "Rostlab/prot_t5_xl_uniref50"
+    name: "Rostlab/prot_t5_xl_half_uniref50-enc"  # Encoder-only FP16
     device: 0
     repo_id: "t5"
     output_key: "prot_t5_xl"
-  
+
   prost_t5:
-    name: "Rostlab/ProstT5"
-    device: 0
+    name: "Rostlab/ProstT5_fp16"  # Encoder-only FP16 with structural awareness
+    device: 1  # Separate GPU for parallel processing
     repo_id: "t5"
     output_key: "prost_t5"
