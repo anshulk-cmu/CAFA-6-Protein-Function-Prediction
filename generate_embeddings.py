@@ -48,8 +48,8 @@ def setup_logging(log_dir, worker_name=None):
 
 def get_model_and_tokenizer(model_name, device):
     """Load encoder-only ESM models (ESM2, ESM-C, ESM-1b)"""
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModel.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+    model = AutoModel.from_pretrained(model_name, trust_remote_code=True)
     model = model.to(device).eval().half()
     return model, tokenizer
 
