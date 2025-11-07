@@ -175,9 +175,10 @@ def worker_fn(model_key, config, data_list, data_key, seed):
     model_config = config['models'][model_key]
     model_name = model_config['name']
     device = torch.device(f"cuda:{model_config['device']}")
-    batch_size = config['run_params']['batch_size']
+    # Use per-model batch_size if specified, otherwise use global default
+    batch_size = model_config.get('batch_size', config['run_params']['batch_size'])
     save_every = config['run_params']['save_every_n_batches']
-    
+
     worker_name = f"{model_key}_{data_key}"
     logger = setup_logging(config['paths']['log_dir'], worker_name)
     logger.info(f"Worker started on {device} for model {model_name}")

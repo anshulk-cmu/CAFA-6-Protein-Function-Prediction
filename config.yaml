@@ -6,7 +6,7 @@ paths:
   log_dir: "/data/user_data/anshulk/cafa6/logs/"
 
 run_params:
-  batch_size: 16
+  batch_size: 16  # Default batch size (fallback)
   save_every_n_batches: 100
   seed: 42
 
@@ -16,21 +16,24 @@ models:
     device: 0
     repo_id: "esm2"
     output_key: "esm2_3b"
-  
+    batch_size: 24  # Conservative: 3B params, ~9-12GB GPU memory
+
   esm_c_600m:
     name: "Synthyra/ESMplusplus_large"
     device: 1
     repo_id: "esm"
     output_key: "esm_c_600m"
-  
+    batch_size: 32  # Conservative: 600M params, ~4-6GB GPU memory
+
   prot_t5_xl:
     name: "Rostlab/prot_t5_xl_uniref50"
     device: 0
     repo_id: "t5"
     output_key: "prot_t5_xl"
-  
+
   esm1b:
     name: "facebook/esm1b_t33_650M_UR50S"
     device: 1
     repo_id: "esm1b"
     output_key: "esm1b"
+    batch_size: 32  # Conservative: 650M params, ~4-6GB GPU memory
