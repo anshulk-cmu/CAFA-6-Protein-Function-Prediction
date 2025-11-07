@@ -6,7 +6,7 @@ paths:
   log_dir: "/data/user_data/anshulk/cafa6/logs/"
 
 run_params:
-  batch_size: 32  # Optimized for A6000 48GB - encoder-only models
+  batch_size: 32  # Default batch size (fallback)
   save_every_n_batches: 100
   seed: 42
 
@@ -16,9 +16,11 @@ models:
     device: 0
     repo_id: "t5"
     output_key: "prot_t5_xl"
+    batch_size: 48  # Conservative: 1.2B params encoder-only, ~8-10GB GPU memory
 
   prost_t5:
     name: "Rostlab/ProstT5_fp16"  # Encoder-only FP16 with structural awareness
     device: 1  # Separate GPU for parallel processing
     repo_id: "t5"
     output_key: "prost_t5"
+    batch_size: 48  # Conservative: 1.2B params encoder-only, ~8-10GB GPU memory
