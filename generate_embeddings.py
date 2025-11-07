@@ -48,7 +48,13 @@ def setup_logging(log_dir, worker_name=None):
 
 def get_model_and_tokenizer(model_name, device):
     """Load encoder-only ESM models (ESM2, ESM-C, ESM-1b)"""
-    tokenizer = EsmTokenizer.from_pretrained(model_name, trust_remote_code=True)
+    # ESMplusplus doesn't include tokenizer files, use base ESM2 tokenizer
+    if "ESMplusplus" in model_name or "Synthyra" in model_name:
+        tokenizer_path = "facebook/esm2_t36_3B_UR50D"
+    else:
+        tokenizer_path = model_name
+
+    tokenizer = EsmTokenizer.from_pretrained(tokenizer_path)
     model = AutoModel.from_pretrained(model_name, trust_remote_code=True)
     model = model.to(device).eval().half()
     return model, tokenizer
