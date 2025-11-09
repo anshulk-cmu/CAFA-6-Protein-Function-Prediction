@@ -45,7 +45,7 @@ def extract_metrics(benchmark: Dict[str, Any]) -> Dict[str, Any]:
     peak_memory = 0
     memory_snapshots = benchmark.get('memory_snapshots', [])
     for snapshot in memory_snapshots:
-        if snapshot.get('label') == 'final':
+         if snapshot.get('label') == 'final':
             gpu_mem = snapshot.get('gpu_memory', {})
             peak_memory = gpu_mem.get('max_allocated_gb', 0)
             break

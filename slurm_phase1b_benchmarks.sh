@@ -32,7 +32,7 @@ source ~/miniconda3/etc/profile.d/conda.sh
 conda activate cafa6
 
 # Set paths
-PROJECT_DIR="/home/anshulk/CAFA-6-Protein-Function-Prediction"
+PROJECT_DIR="/home/anshulk/cafa6"
 DATA_DIR="/data/user_data/anshulk/cafa6/data"
 EMBEDDINGS_DIR="/data/user_data/anshulk/cafa6/embeddings"
 BENCHMARK_DIR="$PROJECT_DIR/benchmark_results"  # Keep in home (small JSON files)

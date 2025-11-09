@@ -1,0 +1,687 @@
+{
+  "models": {
+    "esm2_3B": {
+      "kernels": [
+        {
+          "rank": 1,
+          "name": "ProfilerStep*",
+          "cuda_time_ms": 4396.230006999999,
+          "cuda_time_us": 4396230.006999999,
+          "cpu_time_us": 420.14499999932013,
+          "calls": 6
+        },
+        {
+          "rank": 2,
+          "name": "aten::linear",
+          "cuda_time_ms": 3596.355939000006,
+          "cuda_time_us": 3596355.939000006,
+          "cpu_time_us": 4664.030999997849,
+          "calls": 651
+        },
+        {
+          "rank": 3,
+          "name": "aten::addmm",
+          "cuda_time_ms": 3596.355939000006,
+          "cuda_time_us": 3596355.939000006,
+          "cpu_time_us": 14986.204999999287,
+          "calls": 651
+        },
+        {
+          "rank": 4,
+          "name": "ampere_sgemm_128x64_tn",
+          "cuda_time_ms": 2061.852519000005,
+          "cuda_time_us": 2061852.519000005,
+          "cpu_time_us": 0,
+          "calls": 396
+        },
+        {
+          "rank": 5,
+          "name": "ampere_sgemm_128x128_tn",
+          "cuda_time_ms": 1533.9751070000025,
+          "cuda_time_us": 1533975.1070000024,
+          "cpu_time_us": 0,
+          "calls": 252
+        },
+        {
+          "rank": 6,
+          "name": "aten::mul",
+          "cuda_time_ms": 206.49616399999707,
+          "cuda_time_us": 206496.16399999708,
+          "cpu_time_us": 10221.492000005765,
+          "calls": 879
+        },
+        {
+          "rank": 7,
+          "name": "aten::add",
+          "cuda_time_ms": 174.3798240000007,
+          "cuda_time_us": 174379.8240000007,
+          "cpu_time_us": 7112.80999999559,
+          "calls": 654
+        },
+        {
+          "rank": 8,
+          "name": "aten::matmul",
+          "cuda_time_ms": 160.59714899999648,
+          "cuda_time_us": 160597.14899999648,
+          "cpu_time_us": 2624.1629999982833,
+          "calls": 216
+        },
+        {
+          "rank": 9,
+          "name": "aten::bmm",
+          "cuda_time_ms": 113.53072799999869,
+          "cuda_time_us": 113530.7279999987,
+          "cpu_time_us": 3835.089000007247,
+          "calls": 216
+        },
+        {
+          "rank": 10,
+          "name": "ampere_sgemm_128x128_nn",
+          "cuda_time_ms": 113.53072799999869,
+          "cuda_time_us": 113530.7279999987,
+          "cpu_time_us": 0,
+          "calls": 216
+        }
+      ],
+      "distribution": {
+        "Other": {
+          "time_ms": 4396.230006999999,
+          "count": 6,
+          "kernels": [
+            {
+              "name": "ProfilerStep*",
+              "time_ms": 4396.230006999999,
+              "calls": 6
+            }
+          ],
+          "percentage": 27.556862066571664
+        },
+        "Linear Layers": {
+          "time_ms": 3596.355939000006,
+          "count": 651,
+          "kernels": [
+            {
+              "name": "aten::linear",
+              "time_ms": 3596.355939000006,
+              "calls": 651
+            }
+          ],
+          "percentage": 22.543016265190374
+        },
+        "Matrix Operations": {
+          "time_ms": 3870.4838160000013,
+          "count": 1083,
+          "kernels": [
+            {
+              "name": "aten::addmm",
+              "time_ms": 3596.355939000006,
+              "calls": 651
+            },
+            {
+              "name": "aten::matmul",
+              "time_ms": 160.59714899999648,
+              "calls": 216
+            },
+            {
+              "name": "aten::bmm",
+              "time_ms": 113.53072799999869,
+              "calls": 216
+            }
+          ],
+          "percentage": 24.261330385030053
+        },
+        "GEMM (Matrix Multiply)": {
+          "time_ms": 3709.3583540000063,
+          "count": 864,
+          "kernels": [
+            {
+              "name": "ampere_sgemm_128x64_tn",
+              "time_ms": 2061.852519000005,
+              "calls": 396
+            },
+            {
+              "name": "ampere_sgemm_128x128_tn",
+              "time_ms": 1533.9751070000025,
+              "calls": 252
+            },
+            {
+              "name": "ampere_sgemm_128x128_nn",
+              "time_ms": 113.53072799999869,
+              "calls": 216
+            }
+          ],
+          "percentage": 23.2513486223205
+        },
+        "Element-wise Operations": {
+          "time_ms": 380.87598799999773,
+          "count": 1533,
+          "kernels": [
+            {
+              "name": "aten::mul",
+              "time_ms": 206.49616399999707,
+              "calls": 879
+            },
+            {
+              "name": "aten::add",
+              "time_ms": 174.3798240000007,
+              "calls": 654
+            }
+          ],
+          "percentage": 2.3874426608874066
+        }
+      },
+      "total_time_ms": 11557.074097000008
+    },
+    "esm_c_600m": {
+      "kernels": [
+        {
+          "rank": 1,
+          "name": "ProfilerStep*",
+          "cuda_time_ms": 1346.6926,
+          "cuda_time_us": 1346692.6,
+          "cpu_time_us": 170.02599999995437,
+          "calls": 6
+        },
+        {
+          "rank": 2,
+          "name": "aten::linear",
+          "cuda_time_ms": 957.586296999998,
+          "cuda_time_us": 957586.296999998,
+          "cpu_time_us": 1031.6369999992785,
+          "calls": 432
+        },
+        {
+          "rank": 3,
+          "name": "aten::matmul",
+          "cuda_time_ms": 957.586296999998,
+          "cuda_time_us": 957586.296999998,
+          "cpu_time_us": 2350.6680000007545,
+          "calls": 432
+        },
+        {
+          "rank": 4,
+          "name": "aten::mm",
+          "cuda_time_ms": 957.586296999998,
+          "cuda_time_us": 957586.296999998,
+          "cpu_time_us": 8915.78500000108,
+          "calls": 432
+        },
+        {
+          "rank": 5,
+          "name": "ampere_sgemm_128x64_tn",
+          "cuda_time_ms": 804.3654739999994,
+          "cuda_time_us": 804365.4739999993,
+          "cpu_time_us": 0,
+          "calls": 360
+        },
+        {
+          "rank": 6,
+          "name": "ampere_sgemm_128x128_tn",
+          "cuda_time_ms": 153.02652099999995,
+          "cuda_time_us": 153026.52099999995,
+          "cpu_time_us": 0,
+          "calls": 72
+        },
+        {
+          "rank": 7,
+          "name": "aten::scaled_dot_product_attention",
+          "cuda_time_ms": 116.19796100000065,
+          "cuda_time_us": 116197.96100000065,
+          "cpu_time_us": 2842.596000000889,
+          "calls": 108
+        },
+        {
+          "rank": 8,
+          "name": "aten::_scaled_dot_product_efficient_attention",
+          "cuda_time_ms": 113.19719099999976,
+          "cuda_time_us": 113197.19099999976,
+          "cpu_time_us": 846.4619999998577,
+          "calls": 108
+        },
+        {
+          "rank": 9,
+          "name": "aten::_efficient_attention_forward",
+          "cuda_time_ms": 113.19719099999976,
+          "cuda_time_us": 113197.19099999976,
+          "cpu_time_us": 1276.9510000005175,
+          "calls": 108
+        },
+        {
+          "rank": 10,
+          "name": "fmha_cutlassF_f32_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<float, cutlass::arch::Sm80, true, 64, 64, 64, true, true>::Params)",
+          "cuda_time_ms": 113.19719099999976,
+          "cuda_time_us": 113197.19099999976,
+          "cpu_time_us": 0,
+          "calls": 108
+        }
+      ],
+      "distribution": {
+        "Other": {
+          "time_ms": 1346.6926,
+          "count": 6,
+          "kernels": [
+            {
+              "name": "ProfilerStep*",
+              "time_ms": 1346.6926,
+              "calls": 6
+            }
+          ],
+          "percentage": 23.90875803941514
+        },
+        "Linear Layers": {
+          "time_ms": 957.586296999998,
+          "count": 432,
+          "kernels": [
+            {
+              "name": "aten::linear",
+              "time_ms": 957.586296999998,
+              "calls": 432
+            }
+          ],
+          "percentage": 17.00068677650154
+        },
+        "Matrix Operations": {
+          "time_ms": 1915.172593999996,
+          "count": 864,
+          "kernels": [
+            {
+              "name": "aten::matmul",
+              "time_ms": 957.586296999998,
+              "calls": 432
+            },
+            {
+              "name": "aten::mm",
+              "time_ms": 957.586296999998,
+              "calls": 432
+            }
+          ],
+          "percentage": 34.00137355300308
+        },
+        "GEMM (Matrix Multiply)": {
+          "time_ms": 957.3919949999993,
+          "count": 432,
+          "kernels": [
+            {
+              "name": "ampere_sgemm_128x64_tn",
+              "time_ms": 804.3654739999994,
+              "calls": 360
+            },
+            {
+              "name": "ampere_sgemm_128x128_tn",
+              "time_ms": 153.02652099999995,
+              "calls": 72
+            }
+          ],
+          "percentage": 16.997237199735064
+        },
+        "Attention": {
+          "time_ms": 455.7895339999999,
+          "count": 432,
+          "kernels": [
+            {
+              "name": "aten::scaled_dot_product_attention",
+              "time_ms": 116.19796100000065,
+              "calls": 108
+            },
+            {
+              "name": "aten::_scaled_dot_product_efficient_attention",
+              "time_ms": 113.19719099999976,
+              "calls": 108
+            },
+            {
+              "name": "aten::_efficient_attention_forward",
+              "time_ms": 113.19719099999976,
+              "calls": 108
+            },
+            {
+              "name": "fmha_cutlassF_f32_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<float, cutlass::arch::Sm80, true, 64, 64, 64, true, true>::Params)",
+              "time_ms": 113.19719099999976,
+              "calls": 108
+            }
+          ],
+          "percentage": 8.09194443134519
+        }
+      },
+      "total_time_ms": 4285.9404199999935
+    },
+    "prot_t5_xl": {
+      "kernels": [
+        {
+          "rank": 1,
+          "name": "ProfilerStep*",
+          "cuda_time_ms": 1205.388541,
+          "cuda_time_us": 1205388.541,
+          "cpu_time_us": 222.34599999990314,
+          "calls": 6
+        },
+        {
+          "rank": 2,
+          "name": "aten::matmul",
+          "cuda_time_ms": 935.6608770000005,
+          "cuda_time_us": 935660.8770000004,
+          "cpu_time_us": 4462.514000000909,
+          "calls": 576
+        },
+        {
+          "rank": 3,
+          "name": "aten::linear",
+          "cuda_time_ms": 854.1821220000005,
+          "cuda_time_us": 854182.1220000006,
+          "cpu_time_us": 1063.5290000013993,
+          "calls": 432
+        },
+        {
+          "rank": 4,
+          "name": "aten::mm",
+          "cuda_time_ms": 854.1821220000005,
+          "cuda_time_us": 854182.1220000006,
+          "cpu_time_us": 9910.200999998908,
+          "calls": 432
+        },
+        {
+          "rank": 5,
+          "name": "ampere_sgemm_128x128_tn",
+          "cuda_time_ms": 617.8399159999998,
+          "cuda_time_us": 617839.9159999997,
+          "cpu_time_us": 0,
+          "calls": 72
+        },
+        {
+          "rank": 6,
+          "name": "aten::copy_",
+          "cuda_time_ms": 158.17330300000006,
+          "cuda_time_us": 158173.30300000007,
+          "cpu_time_us": 4900.713000000789,
+          "calls": 678
+        },
+        {
+          "rank": 7,
+          "name": "void cutlass::Kernel<cutlass_80_tensorop_f16_s16816gemm_relu_f16_256x128_32x3_tn_align8>(cutlass_80_tensorop_f16_s16816gemm_relu_f16_256x128_32x3_tn_align8::Params)",
+          "cuda_time_ms": 149.15048700000037,
+          "cuda_time_us": 149150.48700000037,
+          "cpu_time_us": 0,
+          "calls": 144
+        },
+        {
+          "rank": 8,
+          "name": "aten::to",
+          "cuda_time_ms": 106.65413299999948,
+          "cuda_time_us": 106654.13299999948,
+          "cpu_time_us": 693.2200000007706,
+          "calls": 687
+        },
+        {
+          "rank": 9,
+          "name": "aten::_to_copy",
+          "cuda_time_ms": 106.65413299999948,
+          "cuda_time_us": 106654.13299999948,
+          "cpu_time_us": 2085.171000000506,
+          "calls": 390
+        },
+        {
+          "rank": 10,
+          "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, at::detail::Array<char*, 2>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, at::detail::Array<char*, 2>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+          "cuda_time_ms": 78.90715299999947,
+          "cuda_time_us": 78907.15299999947,
+          "cpu_time_us": 0,
+          "calls": 153
+        }
+      ],
+      "distribution": {
+        "Other": {
+          "time_ms": 1312.0426739999996,
+          "count": 693,
+          "kernels": [
+            {
+              "name": "ProfilerStep*",
+              "time_ms": 1205.388541,
+              "calls": 6
+            },
+            {
+              "name": "aten::to",
+              "time_ms": 106.65413299999948,
+              "calls": 687
+            }
+          ],
+          "percentage": 25.89493451096601
+        },
+        "Matrix Operations": {
+          "time_ms": 1789.8429990000009,
+          "count": 1008,
+          "kernels": [
+            {
+              "name": "aten::matmul",
+              "time_ms": 935.6608770000005,
+              "calls": 576
+            },
+            {
+              "name": "aten::mm",
+              "time_ms": 854.1821220000005,
+              "calls": 432
+            }
+          ],
+          "percentage": 35.32496934929423
+        },
+        "Linear Layers": {
+          "time_ms": 854.1821220000005,
+          "count": 432,
+          "kernels": [
+            {
+              "name": "aten::linear",
+              "time_ms": 854.1821220000005,
+              "calls": 432
+            }
+          ],
+          "percentage": 16.85843802792957
+        },
+        "GEMM (Matrix Multiply)": {
+          "time_ms": 766.9904030000001,
+          "count": 216,
+          "kernels": [
+            {
+              "name": "ampere_sgemm_128x128_tn",
+              "time_ms": 617.8399159999998,
+              "calls": 72
+            },
+            {
+              "name": "void cutlass::Kernel<cutlass_80_tensorop_f16_s16816gemm_relu_f16_256x128_32x3_tn_align8>(cutlass_80_tensorop_f16_s16816gemm_relu_f16_256x128_32x3_tn_align8::Params)",
+              "time_ms": 149.15048700000037,
+              "calls": 144
+            }
+          ],
+          "percentage": 15.137591672741918
+        },
+        "Memory Operations": {
+          "time_ms": 343.734588999999,
+          "count": 1221,
+          "kernels": [
+            {
+              "name": "aten::copy_",
+              "time_ms": 158.17330300000006,
+              "calls": 678
+            },
+            {
+              "name": "aten::_to_copy",
+              "time_ms": 106.65413299999948,
+              "calls": 390
+            },
+            {
+              "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, at::detail::Array<char*, 2>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, at::detail::Array<char*, 2>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+              "time_ms": 78.90715299999947,
+              "calls": 153
+            }
+          ],
+          "percentage": 6.7840664390682734
+        }
+      },
+      "total_time_ms": 3861.4042460000005
+    }
+  },
+  "optimization_opportunities": [
+    {
+      "model": "esm2_3B",
+      "rank": 1,
+      "kernel_name": "aten::linear",
+      "category": "Linear Layers",
+      "time_ms": 3596.355939000006,
+      "calls": 651,
+      "avg_time_ms": 5.524356281106,
+      "optimization": "Fused linear + activation kernel",
+      "expected_speedup": "1.5-2x"
+    },
+    {
+      "model": "esm2_3B",
+      "rank": 2,
+      "kernel_name": "aten::addmm",
+      "category": "Matrix Operations",
+      "time_ms": 3596.355939000006,
+      "calls": 651,
+      "avg_time_ms": 5.524356281106,
+      "optimization": "Optimize kernel parameters",
+      "expected_speedup": "1.2-1.5x"
+    },
+    {
+      "model": "esm2_3B",
+      "rank": 3,
+      "kernel_name": "ampere_sgemm_128x64_tn",
+      "category": "GEMM (Matrix Multiply)",
+      "time_ms": 2061.852519000005,
+      "calls": 396,
+      "avg_time_ms": 5.206698280303043,
+      "optimization": "Custom fused GEMM kernel with optimized tile sizes",
+      "expected_speedup": "2-3x"
+    },
+    {
+      "model": "esm2_3B",
+      "rank": 4,
+      "kernel_name": "ampere_sgemm_128x128_tn",
+      "category": "GEMM (Matrix Multiply)",
+      "time_ms": 1533.9751070000025,
+      "calls": 252,
+      "avg_time_ms": 6.087202805555566,
+      "optimization": "Custom fused GEMM kernel with optimized tile sizes",
+      "expected_speedup": "2-3x"
+    },
+    {
+      "model": "esm_c_600m",
+      "rank": 1,
+      "kernel_name": "aten::linear",
+      "category": "Linear Layers",
+      "time_ms": 957.586296999998,
+      "calls": 432,
+      "avg_time_ms": 2.2166349467592545,
+      "optimization": "Fused linear + activation kernel",
+      "expected_speedup": "1.5-2x"
+    },
+    {
+      "model": "esm_c_600m",
+      "rank": 2,
+      "kernel_name": "aten::matmul",
+      "category": "Matrix Operations",
+      "time_ms": 957.586296999998,
+      "calls": 432,
+      "avg_time_ms": 2.2166349467592545,
+      "optimization": "Optimize kernel parameters",
+      "expected_speedup": "1.2-1.5x"
+    },
+    {
+      "model": "esm_c_600m",
+      "rank": 3,
+      "kernel_name": "aten::mm",
+      "category": "Matrix Operations",
+      "time_ms": 957.586296999998,
+      "calls": 432,
+      "avg_time_ms": 2.2166349467592545,
+      "optimization": "Optimize kernel parameters",
+      "expected_speedup": "1.2-1.5x"
+    },
+    {
+      "model": "prot_t5_xl",
+      "rank": 1,
+      "kernel_name": "aten::matmul",
+      "category": "Matrix Operations",
+      "time_ms": 935.6608770000005,
+      "calls": 576,
+      "avg_time_ms": 1.6244112447916674,
+      "optimization": "Optimize kernel parameters",
+      "expected_speedup": "1.2-1.5x"
+    },
+    {
+      "model": "prot_t5_xl",
+      "rank": 2,
+      "kernel_name": "aten::linear",
+      "category": "Linear Layers",
+      "time_ms": 854.1821220000005,
+      "calls": 432,
+      "avg_time_ms": 1.9772734305555568,
+      "optimization": "Fused linear + activation kernel",
+      "expected_speedup": "1.5-2x"
+    },
+    {
+      "model": "prot_t5_xl",
+      "rank": 3,
+      "kernel_name": "aten::mm",
+      "category": "Matrix Operations",
+      "time_ms": 854.1821220000005,
+      "calls": 432,
+      "avg_time_ms": 1.9772734305555568,
+      "optimization": "Optimize kernel parameters",
+      "expected_speedup": "1.2-1.5x"
+    },
+    {
+      "model": "esm_c_600m",
+      "rank": 4,
+      "kernel_name": "ampere_sgemm_128x64_tn",
+      "category": "GEMM (Matrix Multiply)",
+      "time_ms": 804.3654739999994,
+      "calls": 360,
+      "avg_time_ms": 2.234348538888887,
+      "optimization": "Custom fused GEMM kernel with optimized tile sizes",
+      "expected_speedup": "2-3x"
+    },
+    {
+      "model": "prot_t5_xl",
+      "rank": 4,
+      "kernel_name": "ampere_sgemm_128x128_tn",
+      "category": "GEMM (Matrix Multiply)",
+      "time_ms": 617.8399159999998,
+      "calls": 72,
+      "avg_time_ms": 8.581109944444442,
+      "optimization": "Custom fused GEMM kernel with optimized tile sizes",
+      "expected_speedup": "2-3x"
+    },
+    {
+      "model": "esm2_3B",
+      "rank": 5,
+      "kernel_name": "aten::mul",
+      "category": "Element-wise Operations",
+      "time_ms": 206.49616399999707,
+      "calls": 879,
+      "avg_time_ms": 0.23492168828213544,
+      "optimization": "Kernel fusion (combine multiple ops)",
+      "expected_speedup": "5-10x"
+    },
+    {
+      "model": "prot_t5_xl",
+      "rank": 5,
+      "kernel_name": "aten::copy_",
+      "category": "Memory Operations",
+      "time_ms": 158.17330300000006,
+      "calls": 678,
+      "avg_time_ms": 0.23329395722713872,
+      "optimization": "Eliminate dtype conversions / async transfers",
+      "expected_speedup": "Eliminate overhead"
+    },
+    {
+      "model": "esm_c_600m",
+      "rank": 5,
+      "kernel_name": "ampere_sgemm_128x128_tn",
+      "category": "GEMM (Matrix Multiply)",
+      "time_ms": 153.02652099999995,
+      "calls": 72,
+      "avg_time_ms": 2.1253683472222216,
+      "optimization": "Custom fused GEMM kernel with optimized tile sizes",
+      "expected_speedup": "2-3x"
+    }
+  ]
+}

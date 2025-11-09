@@ -1,0 +1,43 @@
+{
+  "models": {
+    "esm2_3B": {
+      "speedup_total_time": 11.826441832669719,
+      "speedup_throughput": 12.431795521782071,
+      "speedup_batch_time": 12.10813759517431,
+      "cpu_time_sec": 1875.0878813266754,
+      "gpu_time_sec": 158.5504674911499,
+      "cpu_throughput": 0.7655445598855334,
+      "gpu_throughput": 9.5170934313096,
+      "gpu_peak_memory_gb": 20.832707405090332,
+      "memory_per_protein_mb": 21.3326923828125
+    },
+    "esm_c_600m": {
+      "speedup_total_time": 11.580663364751526,
+      "speedup_throughput": 12.106907287961816,
+      "speedup_batch_time": 11.981582611142615,
+      "cpu_time_sec": 475.15003418922424,
+      "gpu_time_sec": 41.02960419654846,
+      "cpu_throughput": 2.9374638531253967,
+      "gpu_throughput": 35.56360253152826,
+      "gpu_peak_memory_gb": 4.5935540199279785,
+      "memory_per_protein_mb": 4.70379931640625
+    },
+    "prot_t5_xl": {
+      "speedup_total_time": 26.67223311562539,
+      "speedup_throughput": 26.996735949226935,
+      "speedup_batch_time": 26.947152300309373,
+      "cpu_time_sec": 1186.1656720638275,
+      "gpu_time_sec": 44.4719295501709,
+      "cpu_throughput": 1.3992751217401054,
+      "gpu_throughput": 37.77586098194,
+      "gpu_peak_memory_gb": 22.721409797668457,
+      "memory_per_protein_mb": 23.2667236328125
+    }
+  },
+  "overall": {
+    "avg_speedup": 16.693112771015546,
+    "max_speedup": 26.67223311562539,
+    "min_speedup": 11.580663364751526,
+    "num_models": 3
+  }
+}
