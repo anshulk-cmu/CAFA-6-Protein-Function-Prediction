@@ -43,10 +43,12 @@ def extract_metrics(benchmark: Dict[str, Any]) -> Dict[str, Any]:
 
     # Extract memory info
     peak_memory = 0
-    if 'final' in benchmark.get('memory_snapshots_by_label', {}):
-        final_mem = benchmark['memory_snapshots_by_label']['final']
-        if 'gpu_allocated_gb' in final_mem:
-            peak_memory = final_mem['gpu_allocated_gb']
+    memory_snapshots = benchmark.get('memory_snapshots', [])
+    for snapshot in memory_snapshots:
+        if snapshot.get('label') == 'final':
+            gpu_mem = snapshot.get('gpu_memory', {})
+            peak_memory = gpu_mem.get('max_allocated_gb', 0)
+            break
 
     # Get total proteins processed
     total_proteins = batch_stats.get('total_items', metadata.get('num_sequences', 0))
