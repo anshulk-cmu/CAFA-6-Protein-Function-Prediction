@@ -78,7 +78,7 @@ def get_prefix_token(model_name: str) -> str:
 def main():
     parser = argparse.ArgumentParser(description='CPU Baseline Benchmark for Phase 1B')
     parser.add_argument('--model', type=str, required=True,
-                       choices=['esm2_3b', 'esm_c_600m', 'esm1b', 'prot_t5_xl', 'prost_t5'],
+                       choices=['esm2_3B', 'esm_c_600m', 'esm1b', 'prot_t5_xl', 'prost_t5'],
                        help='Model to benchmark')
     parser.add_argument('--input', type=str, required=True,
                        help='Input FASTA file')

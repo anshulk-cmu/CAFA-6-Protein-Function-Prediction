@@ -70,8 +70,8 @@ def get_prefix_token(model_name: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description='Profile embedding generation with torch.profiler')
-    parser.add_argument('--model', type=str, default='esm2_3b',
-                       choices=['esm2_3b', 'esm_c_600m', 'esm1b', 'prot_t5_xl', 'prost_t5'],
+    parser.add_argument('--model', type=str, default='esm2_3B',
+                       choices=['esm2_3B', 'esm_c_600m', 'esm1b', 'prot_t5_xl', 'prost_t5'],
                        help='Model to profile')
     parser.add_argument('--input', type=str,
                        default='data/train_sequences_benchmark_1k.fasta',
