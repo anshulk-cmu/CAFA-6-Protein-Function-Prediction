@@ -12,6 +12,7 @@ GPU-accelerated Smith-Waterman local sequence alignment for processing 12 millio
 - 📊 **Competition Features**: Generates KNN similarity features for protein function prediction
 - 🛠️ **Easy to Use**: Simple Python API with progress bars
 - 📈 **Complete Baselines**: CPU implementations for fair performance comparison
+- 🏆 **Library Comparison**: Benchmarks against CUDASW++4.0 (state-of-the-art)
 
 ## Requirements
 
@@ -70,7 +71,9 @@ results = run_phase2a_workflow(
 
 ## Benchmarking
 
-Run the 3-way performance comparison:
+### 3-Way CPU/GPU Comparison
+
+Run the complete performance comparison:
 
 ```bash
 # Run all three benchmarks (sequential sample, parallel full, GPU full)
@@ -93,6 +96,25 @@ python benchmark_comparison.py \
 - `benchmark_results/benchmark_comparison.json`: Raw timing data
 - `benchmark_results/benchmark_comparison.md`: Markdown report with tables
 
+### Library Comparison (CUDASW++4.0)
+
+Compare our custom kernel against the state-of-the-art CUDASW++4.0 library:
+
+```bash
+# Direct comparison against CUDASW++4.0 (if installed)
+python benchmark_library_comparison.py --num-pairs 10000 --output-dir library_comparison
+
+# Use simulated CUDASW++ benchmark (for demonstration without library)
+python benchmark_library_comparison.py --use-mock --num-pairs 10000
+```
+
+**Output:**
+- `library_comparison/library_comparison.json`: Performance metrics
+- `library_comparison/library_comparison.md`: Feature and performance comparison
+- Shows whether custom kernel matches/exceeds library performance
+
+**Note:** If CUDASW++4.0 is not installed, the script will use simulated benchmarks based on published CUDASW++4.0 performance data (60-80 GCUPS on modern GPUs).
+
 ## Output Files
 
 **Similarity Matrices:**
@@ -102,8 +124,10 @@ python benchmark_comparison.py \
 - `test_knn_features.npy`: Top-10 neighbor features for test set (~40 KB)
 
 **Benchmark Results:**
-- `benchmark_comparison.json`: Performance metrics (JSON)
-- `benchmark_comparison.md`: Comparison report (Markdown)
+- `benchmark_comparison.json`: 3-way performance metrics (JSON)
+- `benchmark_comparison.md`: 3-way comparison report (Markdown)
+- `library_comparison.json`: CUDASW++4.0 comparison metrics (JSON)
+- `library_comparison.md`: Library comparison report (Markdown)
 
 ## License
 
