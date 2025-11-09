@@ -1,14 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=cafa6_phase1b
-#SBATCH --output=/data/user_data/anshulk/cafa6/logs/slurm/phase1b_%j.out
-#SBATCH --error=/data/user_data/anshulk/cafa6/logs/slurm/phase1b_%j.err
-#SBATCH --partition=gpu
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --partition=general
+#SBATCH --gres=gpu:A6000:1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
-#SBATCH --gres=gpu:1
 #SBATCH --time=06:00:00
+#SBATCH --output=/data/user_data/anshulk/cafa6/logs/slurm/phase1b_%j.out
+#SBATCH --error=/data/user_data/anshulk/cafa6/logs/slurm/phase1b_%j.err
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=anshulk@andrew.cmu.edu
 
