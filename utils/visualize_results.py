@@ -249,8 +249,9 @@ def plot_batch_time_series(benchmark_data: Dict, output_path: Path):
     batch_indices = np.arange(1, num_batches + 1)
 
     for model in models:
-        cpu_mean = benchmark_data['models'][model]['mean_batch_time_sec']
-        gpu_mean = benchmark_data['models'][model]['mean_batch_time_sec'] / benchmark_data['models'][model]['speedup_batch_time']
+        # Calculate mean batch time from total time (1000 proteins, ~42 batches)
+        cpu_mean = benchmark_data['models'][model]['cpu_time_sec'] / num_batches
+        gpu_mean = benchmark_data['models'][model]['gpu_time_sec'] / num_batches
 
         # Add small variation to simulate realistic batch times
         cpu_variation = np.random.normal(0, cpu_mean * 0.05, num_batches)
