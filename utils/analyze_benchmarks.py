@@ -27,7 +27,7 @@ def extract_metrics(benchmark: Dict[str, Any]) -> Dict[str, Any]:
     memory_snapshots = benchmark.get('memory_snapshots', [])
 
     # Extract timing information
-    total_time = benchmark.get('total_elapsed_time', 0)
+    total_time = benchmark.get('total_time', 0)
 
     # Extract throughput
     throughput = batch_stats.get('throughput', {})
