@@ -77,6 +77,8 @@ def calculate_speedup(cpu_metrics: Dict, gpu_metrics: Dict) -> Dict[str, Any]:
         'speedup_batch_time': speedup_batch,
         'cpu_time_sec': cpu_metrics['total_time_sec'],
         'gpu_time_sec': gpu_metrics['total_time_sec'],
+        'cpu_batch_time_sec': cpu_metrics['mean_batch_time_sec'],
+        'gpu_batch_time_sec': gpu_metrics['mean_batch_time_sec'],
         'cpu_throughput': cpu_metrics['mean_throughput_proteins_per_sec'],
         'gpu_throughput': gpu_metrics['mean_throughput_proteins_per_sec'],
         'gpu_peak_memory_gb': gpu_metrics['peak_memory_gb'],
