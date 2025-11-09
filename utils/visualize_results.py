@@ -245,11 +245,11 @@ def plot_batch_time_series(benchmark_data: Dict, output_path: Path):
     fig, ax = plt.subplots(figsize=(12, 6))
 
     # Simulate batch times with slight variation (representative)
-    num_batches = 42
+    num_batches = 32  # Actual number of batches from benchmark data
     batch_indices = np.arange(1, num_batches + 1)
 
     for model in models:
-        # Calculate mean batch time from total time (1000 proteins, ~42 batches)
+        # Calculate mean batch time from total time (1000 proteins, 32 batches)
         cpu_mean = benchmark_data['models'][model]['cpu_time_sec'] / num_batches
         gpu_mean = benchmark_data['models'][model]['gpu_time_sec'] / num_batches
 
@@ -268,7 +268,7 @@ def plot_batch_time_series(benchmark_data: Dict, output_path: Path):
 
     ax.set_xlabel('Batch Number', fontweight='bold')
     ax.set_ylabel('Batch Processing Time (seconds)', fontweight='bold')
-    ax.set_title('Phase 1B: Batch Processing Time Series\n(1000 proteins across 42 batches)', fontsize=13, fontweight='bold')
+    ax.set_title('Phase 1B: Batch Processing Time Series\n(1000 proteins across 32 batches)', fontsize=13, fontweight='bold')
     ax.legend(loc='upper right', ncol=2, framealpha=0.9, fontsize=8)
     ax.grid(True, alpha=0.3, linestyle=':')
     ax.set_xlim(1, num_batches)
