@@ -14,7 +14,7 @@ import json
 
 import torch
 import numpy as np
-from transformers import AutoTokenizer, AutoModel, T5EncoderModel
+from transformers import AutoTokenizer, AutoModel, T5EncoderModel, T5Tokenizer
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -146,6 +146,14 @@ def main():
         if 'esmplusplus' in model_name.lower() or 'synthyra' in model_name.lower():
             logging.info("Loading ESM2 tokenizer for ESMplusplus model")
             tokenizer = AutoTokenizer.from_pretrained("facebook/esm2_t36_3B_UR50D")
+        elif is_t5:
+            # T5 models require T5Tokenizer with legacy=True for compatibility
+            logging.info("Loading T5Tokenizer with legacy=True")
+            tokenizer = T5Tokenizer.from_pretrained(
+                model_name,
+                do_lower_case=False,
+                legacy=True
+            )
         else:
             tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
