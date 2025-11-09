@@ -1,168 +1,77 @@
 # CAFA 6 Protein Function Prediction
 
-**Dual-Track Project:** GPU Programming (Track 2) + CAFA 6 Competition
-
-Predicting protein function using state-of-the-art language models, custom CUDA kernels, and ensemble learning. This project combines cutting-edge deep learning with high-performance GPU computing to tackle the Critical Assessment of protein Function Annotation (CAFA) challenge.
-
----
-
-## Project Overview
-
-**Track A - CAFA 6 Competition (Deadline: Jan 26, 2026)**
-- Goal: Predict Gene Ontology (GO) terms for 224K test proteins
-- Target: F-max score 0.38-0.42 (competitive for top 3)
-- Prize: $8,000-$15,000
-
-**Track B - GPU Programming Project (Deadline: Nov 27, 2025)**
-- Goal: Demonstrate GPU acceleration expertise via custom CUDA kernels
-- Custom implementations: Smith-Waterman alignment, GO graph propagation
-- Target speedup: 20-100x over CPU/library baselines
+**Dual-Track GPU Acceleration Project** • IIT Jodhpur 
+*High-Performance Protein Language Model Inference + Custom CUDA Kernels*
 
 ---
 
-## Architecture
+## Project Objective
 
-### Phase 1: Embedding Generation ✅ **COMPLETE**
+This project tackles protein function prediction through two synchronized tracks: competing in the CAFA 6 challenge while demonstrating advanced GPU programming expertise through custom CUDA kernel development (academic deadline November 27, 2025). The goal is predicting Gene Ontology (GO) terms for 224,309 test proteins using state-of-the-art protein language models accelerated by GPU computing.
 
-**5 Protein Language Models:**
-- **ESM2-3B** (2,560 dims) - Facebook's 3 billion parameter model
-- **ESM-C-600M** (1,152 dims) - ESMplusplus architecture enhancement
-- **ESM1b** (1,280 dims) - 650M parameter evolutionary model
-- **ProtT5-XL** (1,024 dims) - T5 encoder for protein sequences
-- **ProstT5** (1,024 dims) - Structure-aware T5 variant
+## Architecture & Dataset
 
-**Dataset:**
-- Training: 82,404 proteins
-- Test: 224,309 proteins
-- Total embeddings: **7,040 dimensions** (concatenated)
+**Five Protein Language Models Combined:**
+- ESM2-3B (2,560 dimensions) - Facebook's 3 billion parameter evolutionary model
+- ESM-C-600M (1,152 dimensions) - ESMplusplus architecture enhancement  
+- ESM1b (1,280 dimensions) - 650 million parameter model
+- ProtT5-XL (1,024 dimensions) - T5 encoder for protein sequences
+- ProstT5 (1,024 dimensions) - Structure-aware T5 variant
 
-**Performance (Phase 1A - Nov 6):**
-- Runtime: 9.2 hours on 2× NVIDIA RTX A6000 (48GB)
-- GPU 0 utilization: 52.6% mean (max 100%)
-- GPU 1 utilization: 38.1% mean (max 100%)
-- Temperature: 64-77°C average (within safe limits)
+**Total Dataset:** 82,404 training proteins + 224,309 test proteins, generating 7,040-dimensional concatenated embeddings per protein (~8.5 GB total embeddings).
 
-### Phase 1B: Benchmarking & Analysis 🔄 **IN PROGRESS**
+## Phase 1 Achievements (November 6-9)
 
-**Current Status (Nov 8, 21:43 EST):**
-- CPU Baseline: Running ESM2-3B benchmark (19% complete)
-- Estimated completion: ~2 hours
+**Phase 1A: Multi-GPU Embedding Generation**  
+Successfully generated embeddings across five models in 9.2 hours using dual NVIDIA RTX A6000 GPUs (48GB each). Optimized GPU utilization reached 52.6% (GPU 0) and 38.1% (GPU 1) mean with safe operating temperatures (64-77°C). Key optimizations included FP16 mixed precision, length-sorted batching, and smart checkpointing, reducing projected runtime from 18+ hours.
 
-**What's Running:**
-1. CPU benchmarks (3 models) - Establish baseline performance
-2. GPU benchmarks (3 models) - Measure acceleration
-3. torch.profiler analysis - Identify kernel-level bottlenecks
-4. Embedding concatenation & validation - Prepare for downstream training
+**Phase 1B: Performance Benchmarking & Profiling**  
+Comprehensive CPU/GPU benchmarking across 1,000 stratified proteins revealed exceptional acceleration:
 
-**Expected Results:**
-- GPU speedup: 20-30x over CPU for embedding generation
-- Profiling: Attention layers dominate compute (65-70%)
-- Concatenated embeddings: [82K, 7040] train + [224K, 7040] test
+- **ESM2-3B:** 11.8x speedup (31m 15s → 2m 39s), 9.5 proteins/second throughput
+- **ESM-C-600M:** 11.6x speedup (7m 55s → 41s), 35.6 proteins/second throughput  
+- **ProtT5-XL:** 26.7x speedup (19m 46s → 45s), 37.8 proteins/second throughput
+- **Average Speedup:** 16.7x across all models
 
----
+Kernel-level profiling using `torch.profiler` identified critical optimization targets:
+- GEMM matrix operations consume 15-23% of compute time (5,434ms total)
+- Linear layers represent 18.8% (5,408ms) - prime candidates for kernel fusion
+- Memory overhead in ProtT5-XL (344ms) from FP16/FP32 conversions
+- Memory efficiency: 4.6GB (ESM-C) to 22.7GB (ProtT5-XL) peak usage
 
-## Results Achieved
+**Data Validation:**  
+Concatenated embeddings [82,404 × 7,040] train and [224,309 × 7,040] test passed comprehensive validation: shape consistency, zero NaN/Inf values, proper normalization, and dimension mapping verification.
 
-### Embedding Generation Efficiency
-- **Multi-GPU parallelism:** Reduced 18+ hour workload to 9.2 hours
-- **Optimized batch sizes:** 50-60% GPU utilization (up from initial 20-30%)
-- **Memory management:** FP16 precision, smart checkpointing, length-sorted batching
-- **Total embeddings generated:** ~8.5 GB (5 models × 2 splits)
+## Current Focus: Phase 2
 
-### Infrastructure
-- Stratified benchmark dataset (1K proteins) for CPU/GPU comparison
-- Comprehensive performance logging (timing, memory, GPU metrics)
-- GPU monitoring visualization (6-panel dashboard)
-- Automated SLURM pipeline for reproducible benchmarking
+**Custom CUDA Kernel Development - Three-Week Sprint:**
 
----
+**Week 1 (Nov 10-16): Custom GEMM Kernel**  
+Implementing tiled matrix multiplication with shared memory optimization targeting 2-3x speedup over cuBLAS baseline. GEMM operations consume 18.5% of compute time, making this the highest-impact optimization.
 
-## Next Steps
+**Week 2 (Nov 17-23): Kernel Fusion & Optimization**  
+Fusing linear + activation operations for 1.5-2x expected speedup and eliminating ProtT5 dtype conversion overhead (344ms savings). NSight Compute profiling will validate optimizations.
 
-### Immediate (Nov 9-10)
-- Complete Phase 1B benchmarking
-- Analyze CPU vs GPU speedup metrics
-- Generate performance visualizations for Track 2 report
+**Week 3 (Nov 24-27): Integration & Academic Deliverables**  
+End-to-end benchmarking with custom kernels integrated, targeting 20-30x total speedup. Deliverables include a 10-15 page academic report with performance analysis, comprehensive GitHub documentation, and presentation materials.
 
-### Phase 2: Custom CUDA Kernels (Nov 10-18) 🔥 **PRIORITY**
-- **Smith-Waterman alignment kernel:** Batch protein sequence alignment (target: 50-100x CPU speedup)
-- **GO graph propagation kernel:** Hierarchical constraint enforcement on 40K term DAG (target: 20-50x library speedup)
-- NSight Compute profiling and optimization
+## Infrastructure & Technologies
 
-### Phase 3: Prediction Pipeline (Nov 19-22)
-- Multi-layer transformer for GO term classification
-- Integrate custom kernels as drop-in replacements
-- Generate CAFA-format predictions (proof of concept)
+**Computing:** Dual NVIDIA RTX A6000 GPUs (48GB VRAM), Intel Xeon CPUs  
+**Deep Learning:** PyTorch 2.5, HuggingFace Transformers, mixed precision training  
+**GPU Programming:** CUDA, cuBLAS, custom kernels, NSight Compute profiling  
+**Orchestration:** SLURM job scheduling, automated benchmarking pipelines  
+**Analysis:** torch.profiler, comprehensive performance logging, 6-chart visualization suite
 
-### Phase 4: Track 2 Submission (Nov 23-27) 📝 **DEADLINE**
-- 10-15 page academic report with CUDA kernel analysis
-- GitHub repository with comprehensive documentation
-- Presentation slides and demo video
+## Next Steps & Timeline
 
-### Phase 5-7: CAFA Competition (Dec-Jan)
-- Advanced ensemble models (transformer, GNN, similarity transfer)
-- Per-term threshold optimization (critical for F-max)
-- Final submissions targeting top 3 finish
+**Phase 2 Completion (November 10-27):** Finalize custom CUDA kernel implementation with comprehensive benchmarking demonstrating 20-30x total speedup. Academic deliverables include detailed performance analysis report, NSight Compute profiling results, and complete GitHub documentation with reproducible benchmarks.
 
----
+**Competition Optimization (December-January):** Post-academic deadline, dedicate full effort to CAFA leaderboard climb. Implement advanced ensemble models combining transformer architectures with graph neural networks for GO term hierarchy. Develop per-term threshold optimization critical for F-max maximization. Target top-3 competitive ranking (F-max score 0.38-0.42) through iterative model refinement and validation.
 
-## Repository Structure
+## Repository Highlights
 
-```
-CAFA-6-Protein-Function-Prediction/
-├── benchmark_embeddings_cpu.py       # CPU baseline benchmarking
-├── benchmark_embeddings_gpu.py       # GPU benchmarking
-├── create_benchmark_dataset.py       # Stratified sampling
-├── generate_embeddings.py            # ESM models embedding generation
-├── generate_embeddings_t5.py         # T5 models embedding generation
-├── config.yaml, config_t5.yaml       # Model configurations
-├── slurm_phase1b_benchmarks.sh       # Automated benchmarking pipeline
-├── utils/
-│   ├── performance_logger.py         # Metrics tracking
-│   ├── profile_embeddings.py         # torch.profiler integration
-│   ├── concatenate_embeddings.py     # Multi-model fusion
-│   ├── validate_concatenated_embeddings.py
-│   └── plot_gpu_monitoring.py        # Visualization
-├── benchmark_results/                # Performance JSONs (for GitHub)
-├── figures/                          # Visualizations (for reports)
-└── docs/                             # Documentation
-```
+Six publication-ready visualizations at 300 DPI (speedup comparisons, throughput analysis, memory utilization, kernel distributions, performance dashboard). Automated analysis pipeline generates comprehensive reports with quantitative metrics. Validation suite ensures data integrity. Modular codebase supports both competitive development and academic requirements with inline CUDA documentation and reproducible benchmarks.
 
----
-
-## Technologies
-
-- **Deep Learning:** PyTorch 2.5, Transformers (HuggingFace)
-- **Models:** ESM2, ESMplusplus, ProtT5, ProstT5
-- **GPU Computing:** CUDA, cuBLAS, custom kernels
-- **Profiling:** torch.profiler, NSight Compute
-- **Infrastructure:** SLURM, conda, git
-
----
-
-## Team & Timeline
-
-**Developer:** Anshul Kumar (anshulk@andrew.cmu.edu)
-**Institution:** Carnegie Mellon University
-**Hardware:** 2× NVIDIA RTX A6000 (48GB VRAM each)
-
-**Key Milestones:**
-- ✅ Nov 6: Phase 1A complete (embedding generation)
-- 🔄 Nov 8: Phase 1B in progress (benchmarking)
-- 🎯 Nov 27: Track 2 GPU project due
-- 🎯 Jan 26: CAFA 6 competition submission
-
----
-
-## License
-
-MIT License - See LICENSE file for details.
-
----
-
-## Acknowledgments
-
-- CAFA organizers for the protein function prediction challenge
-- Facebook AI Research for ESM models
-- Rostlab for ProtT5/ProstT5 models
-- Synthyra for ESMplusplus architecture
+**Contact:** Anshul Kumar • anshulk@andrew.cmu.edu  • g24ait2048@iitj.ac.in
+**License:** MIT License
