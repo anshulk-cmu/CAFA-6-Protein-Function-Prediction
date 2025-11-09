@@ -63,7 +63,7 @@ if command -v nvidia-smi &> /dev/null; then
 fi
 
 # Models to benchmark (representative subset)
-MODELS=("esm2_3b" "esm_c_600m" "prot_t5_xl")
+MODELS=("esm2_3B" "esm_c_600m" "prot_t5_xl")
 
 # ============================================================================
 # Stage 1: Create Benchmark Dataset
@@ -168,7 +168,7 @@ echo "Start time: $(date)"
 echo ""
 
 python utils/profile_embeddings.py \
-    --model esm2_3b \
+    --model esm2_3B \
     --input $DATA_DIR/train_sequences_benchmark_1k.fasta \
     --batch-size 24 \
     --num-batches 3 \
@@ -196,7 +196,7 @@ echo ""
 
 # Check if all 5 model embeddings exist
 echo "Checking for required embedding files..."
-REQUIRED_MODELS=("esm2_3b" "esm_c_600m" "esm1b" "prot_t5_xl" "prost_t5")
+REQUIRED_MODELS=("esm2_3B" "esm_c_600m" "esm1b" "prot_t5_xl" "prost_t5")
 ALL_EXISTS=true
 
 for split in train test; do
