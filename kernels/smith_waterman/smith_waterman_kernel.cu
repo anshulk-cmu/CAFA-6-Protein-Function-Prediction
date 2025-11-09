@@ -109,6 +109,7 @@ __global__ void smith_waterman_kernel(
     __shared__ int H_current[TILE_SIZE][TILE_SIZE + 1];  // Current tile scores
     __shared__ int H_left_boundary[TILE_SIZE];            // Left boundary (from previous tile)
     __shared__ int H_up_boundary[TILE_SIZE];              // Top boundary (from previous tile)
+    __shared__ int H_diag_corner;                         // Diagonal corner H[tile_i-1, tile_j-1]
     __shared__ int max_score_shared[256];                 // For parallel reduction
 
     // Thread-local maximum score
@@ -118,41 +119,38 @@ __global__ void smith_waterman_kernel(
     int tiles_a = (len_a + TILE_SIZE - 1) / TILE_SIZE;
     int tiles_b = (len_b + TILE_SIZE - 1) / TILE_SIZE;
 
-    // Process tiles in wavefront (anti-diagonal) order
-    int max_wavefront = tiles_a + tiles_b - 1;
+    // Process all tiles for this sequence pair
+    // Each block handles one sequence pair, processing tiles sequentially
+    for (int tile_i = 0; tile_i < tiles_a; tile_i++) {
+        for (int tile_j = 0; tile_j < tiles_b; tile_j++) {
+            // === STEP 1: Load boundary values from previous tiles ===
 
-    for (int wavefront = 0; wavefront < max_wavefront; wavefront++) {
-        // Determine tile coordinates for this thread block on current wavefront
-        // Multiple tiles can be processed in parallel on same wavefront
-        int tile_i = wavefront - tiles_b + 1;  // Start position for this wavefront
+            // Initialize boundaries to zero (will be overwritten if not first row/col)
+            if (tx == 0) H_left_boundary[ty] = 0;
+            if (ty == 0) H_up_boundary[tx] = 0;
+            if (tx == 0 && ty == 0) H_diag_corner = 0;
+            __syncthreads();
 
-        // Each wavefront processes multiple tiles in parallel
-        // For simplicity, we process one tile per block (can be optimized)
-        if (tile_i >= 0 && tile_i < tiles_a) {
-            int tile_j = wavefront - tile_i;
+            // Load left boundary (from tile to the left: tile[i, j-1])
+            if (tile_j > 0 && tx == 0) {
+                // Index into global boundary buffer
+                int boundary_idx = pair_idx * MAX_SEQ_LEN * 4 + (tile_i * tiles_b + (tile_j - 1)) * TILE_SIZE + ty;
+                H_left_boundary[ty] = tile_boundaries[boundary_idx];
+            }
 
-            if (tile_j >= 0 && tile_j < tiles_b) {
-                // === STEP 1: Load boundary values from previous tiles ===
+            // Load top boundary (from tile above: tile[i-1, j])
+            if (tile_i > 0 && ty == 0) {
+                int boundary_idx = pair_idx * MAX_SEQ_LEN * 4 + tiles_a * tiles_b * TILE_SIZE + ((tile_i - 1) * tiles_b + tile_j) * TILE_SIZE + tx;
+                H_up_boundary[tx] = tile_boundaries[boundary_idx];
+            }
 
-                // Initialize boundaries to zero (will be overwritten if not first row/col)
-                if (tx == 0) H_left_boundary[ty] = 0;
-                if (ty == 0) H_up_boundary[tx] = 0;
-                __syncthreads();
+            // Load diagonal corner (from tile[i-1, j-1])
+            if (tile_i > 0 && tile_j > 0 && tx == 0 && ty == 0) {
+                int boundary_idx = pair_idx * MAX_SEQ_LEN * 4 + 2 * tiles_a * tiles_b * TILE_SIZE + (tile_i - 1) * tiles_b + (tile_j - 1);
+                H_diag_corner = tile_boundaries[boundary_idx];
+            }
 
-                // Load left boundary (from tile to the left)
-                if (tile_j > 0 && tx == 0) {
-                    // Index into global boundary buffer
-                    int boundary_idx = pair_idx * MAX_SEQ_LEN + tile_i * TILE_SIZE + ty;
-                    H_left_boundary[ty] = tile_boundaries[boundary_idx];
-                }
-
-                // Load top boundary (from tile above)
-                if (tile_i > 0 && ty == 0) {
-                    int boundary_idx = pair_idx * MAX_SEQ_LEN + tile_j * TILE_SIZE + tx;
-                    H_up_boundary[tx] = tile_boundaries[boundary_idx + MAX_SEQ_LEN];
-                }
-
-                __syncthreads();
+            __syncthreads();
 
                 // === STEP 2: Compute scores for this tile ===
 
@@ -177,7 +175,7 @@ __global__ void smith_waterman_kernel(
                             int aa_b = aa_to_index(seq_b[gj]);
                             int match_score = d_blosum62[aa_a][aa_b];
 
-                            // === DEPENDENCY LOADING (CRITICAL FIX) ===
+                            // === DEPENDENCY LOADING (FIXED: Correct diagonal handling) ===
                             int score_diag = 0;
                             int score_up = 0;
                             int score_left = 0;
@@ -188,14 +186,13 @@ __global__ void smith_waterman_kernel(
                                     // Within current tile
                                     score_diag = H_current[local_i - 1][local_j - 1];
                                 } else if (local_i == 0 && local_j == 0) {
-                                    // From previous tile (both boundaries)
-                                    // This requires storing diagonal value separately (simplified: use 0)
-                                    score_diag = 0;
+                                    // From previous tile's diagonal corner H[tile_i-1, tile_j-1]
+                                    score_diag = H_diag_corner;
                                 } else if (local_i == 0) {
-                                    // From top boundary
+                                    // From top boundary (last row of tile above)
                                     score_diag = H_up_boundary[local_j - 1];
                                 } else if (local_j == 0) {
-                                    // From left boundary
+                                    // From left boundary (last column of tile to left)
                                     score_diag = H_left_boundary[local_i - 1];
                                 }
                             }
@@ -238,26 +235,28 @@ __global__ void smith_waterman_kernel(
                     __syncthreads();
                 }
 
-                // === STEP 3: Store boundary values for next tiles ===
+            // === STEP 3: Store boundary values for next tiles ===
 
-                // Store right boundary (rightmost column) for tile to the right
-                if (tx == TILE_SIZE - 1 && tile_j < tiles_b - 1) {
-                    int boundary_idx = pair_idx * MAX_SEQ_LEN + tile_i * TILE_SIZE + ty;
-                    tile_boundaries[boundary_idx] = H_current[tx][ty];
-                }
-
-                // Store bottom boundary (bottom row) for tile below
-                if (ty == TILE_SIZE - 1 && tile_i < tiles_a - 1) {
-                    int boundary_idx = pair_idx * MAX_SEQ_LEN + tile_j * TILE_SIZE + tx;
-                    tile_boundaries[boundary_idx + MAX_SEQ_LEN] = H_current[tx][ty];
-                }
-
-                __syncthreads();
+            // Store right boundary (rightmost column) for tile to the right
+            if (tx == TILE_SIZE - 1) {
+                int boundary_idx = pair_idx * MAX_SEQ_LEN * 4 + (tile_i * tiles_b + tile_j) * TILE_SIZE + ty;
+                tile_boundaries[boundary_idx] = H_current[tx][ty];
             }
-        }
 
-        // Synchronize between wavefronts
-        __syncthreads();
+            // Store bottom boundary (bottom row) for tile below
+            if (ty == TILE_SIZE - 1) {
+                int boundary_idx = pair_idx * MAX_SEQ_LEN * 4 + tiles_a * tiles_b * TILE_SIZE + (tile_i * tiles_b + tile_j) * TILE_SIZE + tx;
+                tile_boundaries[boundary_idx] = H_current[tx][ty];
+            }
+
+            // Store bottom-right corner for diagonal of next tile
+            if (tx == TILE_SIZE - 1 && ty == TILE_SIZE - 1) {
+                int boundary_idx = pair_idx * MAX_SEQ_LEN * 4 + 2 * tiles_a * tiles_b * TILE_SIZE + tile_i * tiles_b + tile_j;
+                tile_boundaries[boundary_idx] = H_current[tx][ty];
+            }
+
+            __syncthreads();
+        }
     }
 
     // ========================================================================
@@ -308,8 +307,10 @@ void launch_smith_waterman(
     cudaStream_t stream
 ) {
     // Allocate global memory for tile boundaries
+    // Layout: [right_boundaries | bottom_boundaries | diagonal_corners]
+    // Size: num_pairs * MAX_SEQ_LEN * 4 (increased from 2 to account for all boundaries)
     int* d_tile_boundaries;
-    size_t boundary_size = num_pairs * MAX_SEQ_LEN * 2 * sizeof(int);
+    size_t boundary_size = num_pairs * MAX_SEQ_LEN * 4 * sizeof(int);
     cudaMalloc(&d_tile_boundaries, boundary_size);
     cudaMemset(d_tile_boundaries, 0, boundary_size);
 

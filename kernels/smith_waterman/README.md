@@ -113,7 +113,7 @@ python benchmark_library_comparison.py --use-mock --num-pairs 10000
 - `library_comparison/library_comparison.md`: Feature and performance comparison
 - Shows whether custom kernel matches/exceeds library performance
 
-**Note:** If CUDASW++4.0 is not installed, the script will use simulated benchmarks based on published CUDASW++4.0 performance data (60-80 GCUPS on modern GPUs).
+**Note:** If CUDASW++4.0 is not installed, the script will use simulated benchmarks based on published CUDASW++4.0 performance data (1.94-5.71 TCUPS on A100/H100 GPUs, ~2.0 TCUPS on RTX A6000).
 
 ## Output Files
 
