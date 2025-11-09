@@ -229,9 +229,13 @@ def run_cudasw_mock_benchmark(
     """
     Simulated CUDASW++ benchmark for demonstration purposes
 
-    Uses realistic timing estimates based on CUDASW++4.0 published benchmarks:
-    - CUDASW++4.0 achieves ~50-100 GCUPS (billion cell updates per second)
-    - For comparison, we estimate similar performance to our custom kernel
+    Uses realistic timing estimates based on CUDASW++4.0 published benchmarks (2024):
+    - A100 GPU: 1.94 TCUPS (trillions of cell updates per second)
+    - L40S GPU: 5.01 TCUPS
+    - H100 GPU: 5.71 TCUPS
+
+    Reference: https://github.com/asbschmidt/CUDASW4
+    bioRxiv preprint: "CUDASW++4.0: Ultra-fast GPU-based Smith-Waterman..."
 
     This mock is ONLY used when actual CUDASW++ is not available.
     """
@@ -239,24 +243,28 @@ def run_cudasw_mock_benchmark(
     logger.info("BENCHMARK: CUDASW++4.0 (Simulated - Library Not Installed)")
     logger.info("=" * 80)
     logger.warning("CUDASW++ library not found - using simulated benchmark")
-    logger.warning("Install CUDASW++4.0 for real comparison: https://github.com/matchy233/cudasw")
+    logger.warning("Install CUDASW++4.0 for real comparison: https://github.com/asbschmidt/CUDASW4")
 
     num_pairs = len(sequences_a)
 
     # Estimate based on published CUDASW++4.0 benchmarks
-    # CUDASW++4.0 typically achieves 60-80 GCUPS on modern GPUs
+    # Using conservative estimate for A100 GPU (RTX A6000 has similar compute capability)
+    # CUDASW++4.0 achieves 1.94-5.71 TCUPS depending on GPU
     avg_seq_length = np.mean([len(s) for s in sequences_a + sequences_b])
     total_cells = num_pairs * avg_seq_length * avg_seq_length
-    gcups = 70  # Conservative estimate for CUDASW++4.0
 
-    estimated_seconds = (total_cells / 1e9) / gcups
+    # Conservative: 2.0 TCUPS (2000 GCUPS) for RTX A6000
+    tcups = 2.0  # Trillions of cell updates per second
+    gcups = tcups * 1000  # Convert to billions
 
-    # Add realistic overhead (memory transfer, initialization)
-    estimated_seconds *= 1.2
+    estimated_seconds = (total_cells / 1e12) / tcups
+
+    # Add realistic overhead (memory transfer, initialization, I/O)
+    estimated_seconds *= 1.15
 
     logger.info(f"Simulating CUDASW++ on {num_pairs:,} sequence pairs...")
-    logger.info(f"  Estimated GCUPS: {gcups}")
-    logger.info(f"  Estimated time: {estimated_seconds:.2f}s")
+    logger.info(f"  Estimated TCUPS: {tcups:.2f} (RTX A6000 conservative estimate)")
+    logger.info(f"  Estimated time: {estimated_seconds:.3f}s")
 
     # Simulate execution time (shortened for demo - use 10% of actual)
     time.sleep(min(estimated_seconds * 0.1, 5.0))
