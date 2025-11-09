@@ -219,10 +219,10 @@ def main():
         for item in key_avg:
             kernel_stats.append({
                 'name': item.key,
-                'cpu_time': item.cpu_time_total,
-                'cuda_time': item.cuda_time_total,
+                'cpu_time': item.self_cpu_time_total,
+                'cuda_time': getattr(item, 'device_time_total', 0),  # Fallback to 0 if not available
                 'cpu_time_avg': item.cpu_time,
-                'cuda_time_avg': item.cuda_time,
+                'cuda_time_avg': getattr(item, 'device_time', 0),  # Fallback to 0 if not available
                 'calls': item.count,
                 'input_shapes': str(item.input_shapes) if hasattr(item, 'input_shapes') else None
             })
@@ -317,7 +317,7 @@ def main():
                     'cpu_time_total': 0,
                     'calls': 0
                 }
-            kernel_totals[name]['cuda_time_total'] += stat['cuda_time']
+            kernel_totals[name]['cuda_time_total'] += stat.get('cuda_time', 0)
             kernel_totals[name]['cpu_time_total'] += stat['cpu_time']
             kernel_totals[name]['calls'] += stat['calls']
 
