@@ -162,24 +162,42 @@ echo ""
 # ============================================================================
 
 echo "========================================================================"
-echo "Stage 4: Profiling ESM2-3B with torch.profiler"
+echo "Stage 4: Profiling with torch.profiler"
 echo "========================================================================"
 echo "Start time: $(date)"
 echo ""
 
-python utils/profile_embeddings.py \
-    --model esm2_3B \
-    --input $DATA_DIR/train_sequences_benchmark_1k.fasta \
-    --batch-size 24 \
-    --num-batches 3 \
-    --output-dir $TRACES_DIR \
-    --gpu-id 0
+# Profile each model to identify kernel-level bottlenecks
+for model in "${MODELS[@]}"; do
+    echo "----------------------------------------------------------------------"
+    echo "Profiling $model"
+    echo "----------------------------------------------------------------------"
 
-if [ $? -eq 0 ]; then
-    echo "✓ Profiling completed"
-else
-    echo "✗ Profiling failed"
-fi
+    # Set batch size based on model (smaller for larger models)
+    if [ "$model" = "esm2_3B" ]; then
+        BATCH_SIZE=24
+    elif [ "$model" = "esm_c_600m" ]; then
+        BATCH_SIZE=32
+    else
+        BATCH_SIZE=32
+    fi
+
+    python utils/profile_embeddings.py \
+        --model $model \
+        --input $DATA_DIR/train_sequences_benchmark_1k.fasta \
+        --batch-size $BATCH_SIZE \
+        --num-batches 3 \
+        --output-dir $TRACES_DIR \
+        --gpu-id 0
+
+    if [ $? -eq 0 ]; then
+        echo "✓ Profiling for $model completed"
+    else
+        echo "✗ Profiling for $model failed"
+    fi
+
+    echo ""
+done
 
 echo "Profiling completed at: $(date)"
 echo ""
@@ -347,11 +365,13 @@ done
 
 echo ""
 echo "Profiling Traces:"
-if ls traces/esm2_3b_profile*.json 1> /dev/null 2>&1; then
-    echo "  ✓ traces/esm2_3b_profile*.json"
-else
-    echo "  ✗ traces/esm2_3b_profile*.json (missing)"
-fi
+for model in "${MODELS[@]}"; do
+    if ls $TRACES_DIR/${model}_profile*.json 1> /dev/null 2>&1; then
+        echo "  ✓ ${model}_profile*.json"
+    else
+        echo "  ✗ ${model}_profile*.json (missing)"
+    fi
+done
 
 echo ""
 echo "Concatenated Embeddings:"
