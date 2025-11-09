@@ -37,9 +37,16 @@ conda activate cafa6
 PROJECT_DIR="/home/anshulk/CAFA-6-Protein-Function-Prediction"
 DATA_DIR="/data/user_data/anshulk/cafa6/data"
 EMBEDDINGS_DIR="/data/user_data/anshulk/cafa6/embeddings"
+BENCHMARK_DIR="$PROJECT_DIR/benchmark_results"  # Keep in home (small JSON files)
+TRACES_DIR="/data/user_data/anshulk/cafa6/traces"
 LOG_DIR="/data/user_data/anshulk/cafa6/logs"
 
 cd $PROJECT_DIR
+
+# Create necessary directories
+mkdir -p $BENCHMARK_DIR
+mkdir -p $TRACES_DIR
+mkdir -p $DATA_DIR
 
 # Check conda environment
 echo "Python: $(which python)"
@@ -72,8 +79,8 @@ echo ""
 
 python create_benchmark_dataset.py \
     --input $DATA_DIR/train_sequences.fasta \
-    --output data/train_sequences_benchmark_1k.fasta \
-    --metadata data/train_sequences_benchmark_1k_metadata.json \
+    --output $DATA_DIR/train_sequences_benchmark_1k.fasta \
+    --metadata $DATA_DIR/train_sequences_benchmark_1k_metadata.json \
     --n-total 1000 \
     --n-short 200 \
     --n-medium 600 \
@@ -102,8 +109,8 @@ for model in "${MODELS[@]}"; do
 
     python benchmark_embeddings_cpu.py \
         --model $model \
-        --input data/train_sequences_benchmark_1k.fasta \
-        --output-dir benchmark_results \
+        --input $DATA_DIR/train_sequences_benchmark_1k.fasta \
+        --output-dir $BENCHMARK_DIR \
         --num-threads 16
 
     if [ $? -eq 0 ]; then
@@ -136,8 +143,8 @@ for model in "${MODELS[@]}"; do
 
     python benchmark_embeddings_gpu.py \
         --model $model \
-        --input data/train_sequences_benchmark_1k.fasta \
-        --output-dir benchmark_results \
+        --input $DATA_DIR/train_sequences_benchmark_1k.fasta \
+        --output-dir $BENCHMARK_DIR \
         --gpu-id 0
 
     if [ $? -eq 0 ]; then
@@ -164,10 +171,10 @@ echo ""
 
 python utils/profile_embeddings.py \
     --model esm2_3b \
-    --input data/train_sequences_benchmark_1k.fasta \
+    --input $DATA_DIR/train_sequences_benchmark_1k.fasta \
     --batch-size 24 \
     --num-batches 3 \
-    --output-dir traces \
+    --output-dir $TRACES_DIR \
     --gpu-id 0
 
 if [ $? -eq 0 ]; then
@@ -315,17 +322,17 @@ echo "Generated Files:"
 echo "----------------------------------------------------------------------"
 
 echo "Benchmark Dataset:"
-if [ -f "data/train_sequences_benchmark_1k.fasta" ]; then
-    echo "  ✓ data/train_sequences_benchmark_1k.fasta"
+if [ -f "$DATA_DIR/train_sequences_benchmark_1k.fasta" ]; then
+    echo "  ✓ $DATA_DIR/train_sequences_benchmark_1k.fasta"
 else
-    echo "  ✗ data/train_sequences_benchmark_1k.fasta (missing)"
+    echo "  ✗ $DATA_DIR/train_sequences_benchmark_1k.fasta (missing)"
 fi
 
 echo ""
 echo "Benchmark Results:"
 for model in "${MODELS[@]}"; do
-    cpu_file="benchmark_results/${model}_cpu_1k.json"
-    gpu_file="benchmark_results/${model}_gpu_1k.json"
+    cpu_file="$BENCHMARK_DIR/${model}_cpu_1k.json"
+    gpu_file="$BENCHMARK_DIR/${model}_gpu_1k.json"
 
     if [ -f "$cpu_file" ]; then
         echo "  ✓ $cpu_file"
